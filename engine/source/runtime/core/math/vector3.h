@@ -1,12 +1,12 @@
 #pragma once
 
-#include "runtime/core/math/math.h"
-#include "runtime/core/math/quaternion.h"
+#include "math.h"
+#include "quaternion.h"
 #include "runtime/core/meta/reflection/reflection.h"
 
 #include <cassert>
 
-namespace Piccolo
+namespace SimpleEngine
 {
     REFLECTION_TYPE(Vector3)
     CLASS(Vector3, Fields)
@@ -22,29 +22,30 @@ namespace Piccolo
         Vector3() = default;
         Vector3(float x_, float y_, float z_) : x {x_}, y {y_}, z {z_} {}
 
-        explicit Vector3(const float coords[3]) : x {coords[0]}, y {coords[1]}, z {coords[2]} {}
+        explicit Vector3(const float coords[3]) : x {coords[0]}, y {coords[1]}, z {coords[2]} {}//显式构造，由数组进行构造
 
+        //数组格式访问分量
         float operator[](size_t i) const
         {
             assert(i < 3);
             return *(&x + i);
         }
-
         float& operator[](size_t i)
         {
             assert(i < 3);
             return *(&x + i);
         }
+
         /// Pointer accessor for direct copying
         float* ptr() { return &x; }
-        /// Pointer accessor for direct copying
         const float* ptr() const { return &x; }
 
+        //比较
         bool operator==(const Vector3& rhs) const { return (x == rhs.x && y == rhs.y && z == rhs.z); }
 
         bool operator!=(const Vector3& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z; }
 
-        // arithmetic operations
+        //向量加减乘除+标量右乘/除
         Vector3 operator+(const Vector3& rhs) const { return Vector3(x + rhs.x, y + rhs.y, z + rhs.z); }
 
         Vector3 operator-(const Vector3& rhs) const { return Vector3(x - rhs.x, y - rhs.y, z - rhs.z); }
@@ -65,11 +66,13 @@ namespace Piccolo
             return Vector3(x / rhs.x, y / rhs.y, z / rhs.z);
         }
 
+        
         const Vector3& operator+() const { return *this; }
 
+        //取负
         Vector3 operator-() const { return Vector3(-x, -y, -z); }
 
-        // overloaded operators to help Vector3
+        //左乘/除标量
         friend Vector3 operator*(float scalar, const Vector3& rhs)
         {
             return Vector3(scalar * rhs.x, scalar * rhs.y, scalar * rhs.z);
@@ -81,6 +84,7 @@ namespace Piccolo
             return Vector3(scalar / rhs.x, scalar / rhs.y, scalar / rhs.z);
         }
 
+        //标量的值加/减每一个分量
         friend Vector3 operator+(const Vector3& lhs, float rhs)
         {
             return Vector3(lhs.x + rhs, lhs.y + rhs, lhs.z + rhs);
@@ -175,7 +179,7 @@ namespace Piccolo
         length (e.g. for just comparing lengths) use squaredLength()
         instead.
         */
-
+        //模长
         float length() const { return std::hypot(x, y, z); }
 
         /** Returns the square of the length(magnitude) of the vector.
@@ -188,6 +192,7 @@ namespace Piccolo
         want to find the longest / shortest vector without incurring
         the square root.
         */
+        //模长平方
         float squaredLength() const { return x * x + y * y + z * z; }
 
         /** Returns the distance to another vector.
@@ -197,7 +202,7 @@ namespace Piccolo
         distance (e.g. for just comparing distances) use squaredDistance()
         instead.
         */
-
+        //两向量距离
         float distance(const Vector3& rhs) const { return (*this - rhs).length(); }
 
         /** Returns the square of the distance to another vector.
@@ -210,7 +215,7 @@ namespace Piccolo
         Use this if you want to find the longest / shortest distance
         without incurring the square root.
         */
-
+        //两向量距离的平方
         float squaredDistance(const Vector3& rhs) const { return (*this - rhs).squaredLength(); }
 
         /** Calculates the dot (scalar) product of this vector with another.
@@ -227,7 +232,7 @@ namespace Piccolo
         @returns
         A float representing the dot product value.
         */
-
+        //点乘
         float dotProduct(const Vector3& vec) const { return x * vec.x + y * vec.y + z * vec.z; }
 
         /** Normalizes the vector.
@@ -239,7 +244,7 @@ namespace Piccolo
         will be no changes made to their components.
         @returns The previous length of the vector.
         */
-
+        //归一化
         void normalise()
         {
             float length = std::hypot(x, y, z);
@@ -280,7 +285,7 @@ namespace Piccolo
         and will go <i>inside</i> the screen, towards the cathode tube
         (assuming you're using a CRT monitor, of course).
         */
-
+        //叉乘
         Vector3 crossProduct(const Vector3& rhs) const
         {
             return Vector3(y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x);
@@ -293,6 +298,7 @@ namespace Piccolo
         value of x, y and z from both vectors. Lowest is taken just
         numerically, not magnitude, so -1 < 0.
         */
+        //比较另一个向量，找两者最小的分量保存
         void makeFloor(const Vector3& cmp)
         {
             if (cmp.x < x)
@@ -310,6 +316,7 @@ namespace Piccolo
         value of x, y and z from both vectors. Highest is taken just
         numerically, not magnitude, so 1 > -3.
         */
+        //比较另一个向量，找两者最大的分量保存
         void makeCeil(const Vector3& cmp)
         {
             if (cmp.x > x)
@@ -324,7 +331,7 @@ namespace Piccolo
         @remarks
         Vectors do not have to be unit-length but must represent directions.
         */
-
+        //两向量夹角
         Radian angleBetween(const Vector3& dest) const
         {
             float len_product = length() * dest.length();
@@ -396,18 +403,20 @@ namespace Piccolo
             return q;
         }
 
-        /** Returns true if this vector is zero length. */
+        //是否长度为0
         bool isZeroLength(void) const
         {
             float sqlen = (x * x) + (y * y) + (z * z);
             return (sqlen < (1e-06 * 1e-06));
         }
 
+        //是否为零向量
         bool isZero() const { return x == 0.f && y == 0.f && z == 0.f; }
 
         /** As normalise, except that this vector is unaffected and the
         normalised vector is returned as a copy. */
 
+        //把向量归一化后返回一个新向量，不改变原向量
         Vector3 normalisedCopy(void) const
         {
             Vector3 ret = *this;
@@ -426,20 +435,24 @@ namespace Piccolo
         /** Calculates projection to a plane with the given normal
         @param normal The normal of given plane
         */
+        //获取在normal向量上的投影
         Vector3 project(const Vector3& normal) const { return Vector3(*this - (this->dotProduct(normal) * normal)); }
 
+        //所有分量取绝对值，然后返回新向量，不改变原向量
         Vector3 absoluteCopy() const { return Vector3(fabsf(x), fabsf(y), fabsf(z)); }
 
+        //用alpha线性插值
         static Vector3 lerp(const Vector3& lhs, const Vector3& rhs, float alpha) { return lhs + alpha * (rhs - lhs); }
 
-        static Vector3 clamp(const Vector3& v, const Vector3& min, const Vector3& max)
+        static Vector3 clamp(const Vector3& v, const Vector3& min, const Vector3& max)//控制范围
         {
             return Vector3(
                 Math::clamp(v.x, min.x, max.x), Math::clamp(v.y, min.y, max.y), Math::clamp(v.z, min.z, max.z));
         }
 
-        static float getMaxElement(const Vector3& v) { return Math::getMaxElement(v.x, v.y, v.z); }
-        bool         isNaN() const { return Math::isNan(x) || Math::isNan(y) || Math::isNan(z); }
+        static float getMaxElement(const Vector3& v) { return Math::getMaxElement(v.x, v.y, v.z); }//获取最大的元素
+        bool         isNaN() const { return Math::isNan(x) || Math::isNan(y) || Math::isNan(z); }//是否为空
+
         // special points
         static const Vector3 ZERO;
         static const Vector3 UNIT_X;
@@ -450,4 +463,4 @@ namespace Piccolo
         static const Vector3 NEGATIVE_UNIT_Z;
         static const Vector3 UNIT_SCALE;
     };
-} // namespace Piccolo
+} // namespace SimpleEngine

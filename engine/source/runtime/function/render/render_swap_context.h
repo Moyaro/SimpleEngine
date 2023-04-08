@@ -1,131 +1,89 @@
 #pragma once
-
-#include "runtime/function/particle/emitter_id_allocator.h"
-#include "runtime/function/particle/particle_desc.h"
 #include "runtime/function/render/render_camera.h"
 #include "runtime/function/render/render_object.h"
-
-#include "runtime/resource/res_type/global/global_particle.h"
 #include "runtime/resource/res_type/global/global_rendering.h"
 
 #include <cstdint>
 #include <deque>
 #include <optional>
 #include <string>
+namespace SimpleEngine {
 
-namespace Piccolo
-{
-    struct LevelIBLResourceDesc
-    {
-        SkyBoxIrradianceMap m_skybox_irradiance_map;
-        SkyBoxSpecularMap   m_skybox_specular_map;
-        std::string         m_brdf_map;
-    };
+	//环境光
+	struct LevelIBLResourceDesc
+	{
+		SkyBoxIrradianceMap m_skybox_irradiance_map;
+		SkyBoxSpecularMap   m_skybox_specular_map;
+		std::string         m_brdf_map;
+	};
 
-    struct LevelColorGradingResourceDesc
-    {
-        std::string m_color_grading_map;
-    };
+	//颜色渐变
+	struct LevelColorGradingResourceDesc
+	{
+		std::string m_color_grading_map;
+	};
 
-    struct LevelResourceDesc
-    {
-        LevelIBLResourceDesc          m_ibl_resource_desc;
-        LevelColorGradingResourceDesc m_color_grading_resource_desc;
-    };
+	//层级资源：天空盒
+	struct LevelResourceDesc
+	{
+		LevelIBLResourceDesc          m_ibl_resource_desc;
+	};
 
-    struct CameraSwapData
-    {
-        std::optional<float>            m_fov_x;
-        std::optional<RenderCameraType> m_camera_type;
-        std::optional<Matrix4x4>        m_view_matrix;
-    };
+	//相机交换数据
+	struct CameraSwapData
+	{
+		std::optional<float>            m_fov_x;
+		std::optional<RenderCameraType> m_camera_type;
+		std::optional<Matrix4x4>        m_view_matrix;
+	};
 
-    struct GameObjectResourceDesc
-    {
-        std::deque<GameObjectDesc> m_game_object_descs;
+	//所有物体
+	struct GameObjectResourceDesc
+	{
+		std::deque<GameObjectDesc> m_game_object_descs;
 
-        void add(GameObjectDesc& desc);
-        void pop();
+		void add(GameObjectDesc& desc) { m_game_object_descs.push_back(desc); }
+		void pop() { m_game_object_descs.pop_front(); }
 
-        bool isEmpty() const;
+		bool isEmpty() const { return m_game_object_descs.empty(); }
 
-        GameObjectDesc& getNextProcessObject();
-    };
+		GameObjectDesc& getNextProcessObject() { return m_game_object_descs.front(); }//获取下一个要处理的物体
+	};
 
-    struct ParticleSubmitRequest
-    {
-        std::vector<ParticleEmitterDesc> m_emitter_descs;
+	struct SwapData
+	{
+		std::optional<LevelResourceDesc>       m_level_resource_desc;//层级资源
+		std::optional<GameObjectResourceDesc>  m_game_object_resource_desc;//现有物体资源
+		std::optional<GameObjectResourceDesc>  m_game_object_to_delete;//需要删除的物体
+		std::optional<CameraSwapData>          m_camera_swap_data;//相机交换数据
 
-        void add(ParticleEmitterDesc& desc);
+		void addDirtyGameObject(GameObjectDesc&& desc);//增加要处理的物体
+		void addDeleteGameObject(GameObjectDesc&& desc);//增加需要删除的物体
+	};
 
-        unsigned int getEmitterCount() const;
+	/// <summary>
+	/// 交换渲染和逻辑数据
+	/// </summary>
+	class RenderSwapContext
+	{
+	public:
+		//获取交换数据
+		SwapData& getLogicSwapData() { return m_swap_data[m_logic_swap_data_index]; }
+		SwapData& getRenderSwapData() { return m_swap_data[m_render_swap_data_index]; }
 
-        const ParticleEmitterDesc& getEmitterDesc(unsigned int index);
-    };
+		void swapLogicRenderData();//如果渲染交换数据为空，重置渲染数据，然后交换逻辑和渲染的索引
 
-    struct EmitterTickRequest
-    {
-        std::vector<ParticleEmitterID> m_emitter_indices;
-    };
+		//重置渲染要交换的数据
+		void resetLevelResourceSwapData() { m_swap_data[m_render_swap_data_index].m_level_resource_desc.reset(); }
+		void resetGameObjectResourceSwapData() { m_swap_data[m_render_swap_data_index].m_game_object_resource_desc.reset(); }
+		void resetGameObjectToDelete() { m_swap_data[m_render_swap_data_index].m_game_object_to_delete.reset(); }
+		void resetCameraSwapData() { m_swap_data[m_render_swap_data_index].m_camera_swap_data.reset(); }
 
-    struct EmitterTransformRequest
-    {
-        std::vector<ParticleEmitterTransformDesc> m_transform_descs;
+	private:
+		uint8_t m_logic_swap_data_index{ 0 };
+		uint8_t m_render_swap_data_index{ 1 };
+		SwapData m_swap_data[2];
 
-        void add(ParticleEmitterTransformDesc& desc);
-
-        void clear();
-
-        unsigned int getEmitterCount() const;
-
-        const ParticleEmitterTransformDesc& getNextEmitterTransformDesc(unsigned int index);
-    };
-
-    struct RenderSwapData
-    {
-        std::optional<LevelResourceDesc>       m_level_resource_desc;
-        std::optional<GameObjectResourceDesc>  m_game_object_resource_desc;
-        std::optional<GameObjectResourceDesc>  m_game_object_to_delete;
-        std::optional<CameraSwapData>          m_camera_swap_data;
-        std::optional<ParticleSubmitRequest>   m_particle_submit_request;
-        std::optional<EmitterTickRequest>      m_emitter_tick_request;
-        std::optional<EmitterTransformRequest> m_emitter_transform_request;
-
-        void addDirtyGameObject(GameObjectDesc&& desc);
-        void addDeleteGameObject(GameObjectDesc&& desc);
-
-        void addNewParticleEmitter(ParticleEmitterDesc& desc);
-        void addTickParticleEmitter(ParticleEmitterID id);
-        void updateParticleTransform(ParticleEmitterTransformDesc& desc);
-    };
-
-    enum SwapDataType : uint8_t
-    {
-        LogicSwapDataType = 0,
-        RenderSwapDataType,
-        SwapDataTypeCount
-    };
-
-    class RenderSwapContext
-    {
-    public:
-        RenderSwapData& getLogicSwapData();
-        RenderSwapData& getRenderSwapData();
-        void            swapLogicRenderData();
-        void            resetLevelRsourceSwapData();
-        void            resetGameObjectResourceSwapData();
-        void            resetGameObjectToDelete();
-        void            resetCameraSwapData();
-        void            resetPartilceBatchSwapData();
-        void            resetEmitterTickSwapData();
-        void            resetEmitterTransformSwapData();
-
-    private:
-        uint8_t        m_logic_swap_data_index {LogicSwapDataType};
-        uint8_t        m_render_swap_data_index {RenderSwapDataType};
-        RenderSwapData m_swap_data[SwapDataTypeCount];
-
-        bool isReadyToSwap() const;
-        void swap();
-    };
-} // namespace Piccolo
+		bool isReadyToSwap();
+	};
+}

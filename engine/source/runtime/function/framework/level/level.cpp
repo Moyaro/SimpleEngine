@@ -6,28 +6,20 @@
 #include "runtime/resource/res_type/common/level.h"
 
 #include "runtime/engine.h"
-#include "runtime/function/character/character.h"
 #include "runtime/function/framework/object/object.h"
-#include "runtime/function/particle/particle_manager.h"
-#include "runtime/function/physics/physics_manager.h"
-#include "runtime/function/physics/physics_scene.h"
 #include <limits>
 
-namespace Piccolo
+namespace SimpleEngine
 {
     void Level::clear()
     {
-        m_current_active_character.reset();
         m_gobjects.clear();
-
-        ASSERT(g_runtime_global_context.m_physics_manager);
-        g_runtime_global_context.m_physics_manager->deletePhysicsScene(m_physics_scene);
     }
 
     GObjectID Level::createObject(const ObjectInstanceRes& object_instance_res)
     {
         GObjectID object_id = ObjectIDAllocator::alloc();
-        ASSERT(object_id != k_invalid_gobject_id);
+        assert(object_id != k_invalid_gobject_id);
 
         std::shared_ptr<GObject> gobject;
         try
@@ -64,27 +56,9 @@ namespace Piccolo
         {
             return false;
         }
-
-        ASSERT(g_runtime_global_context.m_physics_manager);
-        m_physics_scene = g_runtime_global_context.m_physics_manager->createPhysicsScene(level_res.m_gravity);
-
         for (const ObjectInstanceRes& object_instance_res : level_res.m_objects)
         {
             createObject(object_instance_res);
-        }
-
-        // create active character
-        for (const auto& object_pair : m_gobjects)
-        {
-            std::shared_ptr<GObject> object = object_pair.second;
-            if (object == nullptr)
-                continue;
-
-            if (level_res.m_character_name == object->getName())
-            {
-                m_current_active_character = std::make_shared<Character>(object);
-                break;
-            }
         }
 
         m_is_loaded = true;
@@ -105,7 +79,7 @@ namespace Piccolo
         LOG_INFO("saving level: {}", m_level_res_url);
         LevelRes output_level_res;
 
-        const size_t                    object_cout    = m_gobjects.size();
+        const size_t                    object_cout = m_gobjects.size();
         std::vector<ObjectInstanceRes>& output_objects = output_level_res.m_objects;
         output_objects.resize(object_cout);
 
@@ -149,16 +123,6 @@ namespace Piccolo
                 id_object_pair.second->tick(delta_time);
             }
         }
-        if (m_current_active_character && g_is_editor_mode == false)
-        {
-            m_current_active_character->tick(delta_time);
-        }
-
-        std::shared_ptr<PhysicsScene> physics_scene = m_physics_scene.lock();
-        if (physics_scene)
-        {
-            physics_scene->tick(delta_time);
-        }
     }
 
     std::weak_ptr<GObject> Level::getGObjectByID(GObjectID go_id) const
@@ -175,19 +139,7 @@ namespace Piccolo
     void Level::deleteGObjectByID(GObjectID go_id)
     {
         auto iter = m_gobjects.find(go_id);
-        if (iter != m_gobjects.end())
-        {
-            std::shared_ptr<GObject> object = iter->second;
-            if (object)
-            {
-                if (m_current_active_character && m_current_active_character->getObjectID() == object->getID())
-                {
-                    m_current_active_character->setObject(nullptr);
-                }
-            }
-        }
-
         m_gobjects.erase(go_id);
     }
 
-} // namespace Piccolo
+}

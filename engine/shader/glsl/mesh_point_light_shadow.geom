@@ -8,7 +8,7 @@
 // Imagination Technologies Limited. "Dual Paraboloid Environment Mapping." Power SDK Whitepaper 2017.
 // https://github.com/powervr-graphics/Native_SDK/blob/R17.1-v4.3/Documentation/Whitepapers/Dual%20Paraboloid%20Environment%20Mapping.Whitepaper.pdf
 
-#include "constants.h"
+#include "../include/constants.h"
 
 layout(set = 0, binding = 0) readonly buffer _unused_name_global_set_per_frame_binding_buffer
 {

@@ -10,15 +10,15 @@
 #include <unordered_set>
 #include <vector>
 
-namespace Piccolo
+namespace SimpleEngine
 {
-    /// GObject : Game Object base class
+    /// <summary>
+    /// game object的基础类
+    /// </summary>
     class GObject : public std::enable_shared_from_this<GObject>
     {
-        typedef std::unordered_set<std::string> TypeNameSet;
-
     public:
-        GObject(GObjectID id) : m_id {id} {}
+        GObject(GObjectID id) : m_id{ id } {}
         virtual ~GObject();
 
         virtual void tick(float delta_time);
@@ -28,11 +28,13 @@ namespace Piccolo
 
         GObjectID getID() const { return m_id; }
 
-        void               setName(std::string name) { m_name = name; }
+        //物体名
+        void  setName(std::string name) { m_name = name; }
         const std::string& getName() const { return m_name; }
 
         bool hasComponent(const std::string& compenent_type_name) const;
 
+        //获取组件
         std::vector<Reflection::ReflectionPtr<Component>> getComponents() { return m_components; }
 
         template<typename TComponent>
@@ -66,7 +68,7 @@ namespace Piccolo
 #define tryGetComponentConst(COMPONENT_TYPE) tryGetComponentConst<const COMPONENT_TYPE>(#COMPONENT_TYPE)
 
     protected:
-        GObjectID   m_id {k_invalid_gobject_id};
+        GObjectID   m_id{ k_invalid_gobject_id };
         std::string m_name;
         std::string m_definition_url;
 
@@ -74,4 +76,4 @@ namespace Piccolo
         // in editor, and it's polymorphism
         std::vector<Reflection::ReflectionPtr<Component>> m_components;
     };
-} // namespace Piccolo
+}

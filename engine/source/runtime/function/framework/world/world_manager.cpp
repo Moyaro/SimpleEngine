@@ -1,7 +1,5 @@
 #include "runtime/function/framework/world/world_manager.h"
-
-#include "runtime/core/base/macro.h"
-
+#include "core/base/macro.h"
 #include "runtime/resource/asset_manager/asset_manager.h"
 #include "runtime/resource/config_manager/config_manager.h"
 
@@ -11,11 +9,11 @@
 
 #include "_generated/serializer/all_serializer.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     WorldManager::~WorldManager() { clear(); }
 
-    void WorldManager::initialize()
+    void WorldManager::init()
     {
         m_is_world_loaded   = false;
         m_current_world_url = g_runtime_global_context.m_config_manager->getDefaultWorldUrl();
@@ -60,17 +58,6 @@ namespace Piccolo
         }
     }
 
-    std::weak_ptr<PhysicsScene> WorldManager::getCurrentActivePhysicsScene() const
-    {
-        std::shared_ptr<Level> active_level = m_current_active_level.lock();
-        if (!active_level)
-        {
-            return std::weak_ptr<PhysicsScene>();
-        }
-
-        return active_level->getPhysicsScene();
-    }
-
     bool WorldManager::loadWorld(const std::string& world_url)
     {
         LOG_INFO("loading world: {}", world_url);
@@ -91,7 +78,7 @@ namespace Piccolo
 
         // set the default level to be active level
         auto iter = m_loaded_levels.find(world_res.m_default_level_url);
-        ASSERT(iter != m_loaded_levels.end());
+        assert(iter != m_loaded_levels.end());
 
         m_current_active_level = iter->second;
 
@@ -140,7 +127,7 @@ namespace Piccolo
 
         // update the active level instance
         auto iter = m_loaded_levels.find(level_url);
-        ASSERT(iter != m_loaded_levels.end());
+        assert(iter != m_loaded_levels.end());
 
         m_current_active_level = iter->second;
 
@@ -159,4 +146,4 @@ namespace Piccolo
 
         active_level->save();
     }
-} // namespace Piccolo
+}

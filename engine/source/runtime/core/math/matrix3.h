@@ -1,8 +1,8 @@
 #pragma once
 
-#include "runtime/core/math/math.h"
-#include "runtime/core/math/quaternion.h"
-#include "runtime/core/math/vector3.h"
+#include "math.h"
+#include "quaternion.h"
+#include "vector3.h"
 
 #include <cstring>
 
@@ -24,7 +24,7 @@
 //           0       0       1
 // where t > 0 indicates a counterclockwise rotation in the xy-plane.
 
-namespace Piccolo
+namespace SimpleEngine
 {
     /** A 3x3 matrix which can represent rotations around axes.
     @note
@@ -365,4 +365,4 @@ namespace Piccolo
         static const Matrix3x3 ZERO;
         static const Matrix3x3 IDENTITY;
     };
-} // namespace Piccolo
+}

@@ -1,26 +1,27 @@
 #pragma once
 
-#include "runtime/function/render/render_pipeline_base.h"
+#include "render_pipeline_base.h"
+#include "render_resource_base.h"
 
-namespace Piccolo
-{
-    class RenderPipeline : public RenderPipelineBase
-    {
-    public:
-        virtual void initialize(RenderPipelineInitInfo init_info) override final;
+namespace SimpleEngine {
+	class RenderPipeline : public RenderPipelineBase
+	{
+	public:
+		void clear() override{}
 
-        virtual void forwardRender(std::shared_ptr<RHI>                rhi,
-                                   std::shared_ptr<RenderResourceBase> render_resource) override final;
+		void init(RenderPipelineInitInfo init_info) override;
 
-        virtual void deferredRender(std::shared_ptr<RHI>                rhi,
-                                    std::shared_ptr<RenderResourceBase> render_resource) override final;
+		void forwardRender(std::shared_ptr<RenderResourceBase> render_resource) override;
 
-        void passUpdateAfterRecreateSwapchain();
+		void passUpdateAfterRecreateSwapchain();
 
-        virtual uint32_t getGuidOfPickedMesh(const Vector2& picked_uv) override final;
+		virtual uint32_t getGuidOfPickedMesh(const Vector2& picked_uv) override;
 
-        void setAxisVisibleState(bool state);
+		//…Ë÷√÷·◊¥Ã¨
+		void setAxisVisibleState(bool state);
+		void setSelectedAxis(size_t selected_axis);
 
-        void setSelectedAxis(size_t selected_axis);
-    };
-} // namespace Piccolo
+	private:
+
+	};
+}

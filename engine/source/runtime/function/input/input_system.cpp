@@ -10,7 +10,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Piccolo
+namespace SimpleEngine
 {
     unsigned int k_complement_control_command = 0xFFFFFFFF;
 
@@ -137,10 +137,10 @@ namespace Piccolo
         m_cursor_delta_pitch = -(cursor_delta_y / (float)window_size[1]) * fov.y;
     }
 
-    void InputSystem::initialize()
+    void InputSystem::init()
     {
         std::shared_ptr<WindowSystem> window_system = g_runtime_global_context.m_window_system;
-        ASSERT(window_system);
+        assert(window_system);
 
         window_system->registerOnKeyFunc(std::bind(&InputSystem::onKey,
                                                    this,
@@ -167,4 +167,4 @@ namespace Piccolo
             m_game_command |= (unsigned int)GameCommand::invalid;
         }
     }
-} // namespace Piccolo
+}

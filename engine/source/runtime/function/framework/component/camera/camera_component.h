@@ -6,7 +6,7 @@
 
 #include "runtime/function/framework/component/component.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     class RenderCamera;
 
@@ -28,7 +28,7 @@ namespace Piccolo
 
         void postLoadResource(std::weak_ptr<GObject> parent_object) override;
 
-        void tick(float delta_time) override;
+        void tick(float delta_time) override{}
 
         CameraMode getCameraMode() const { return m_camera_mode; }
         void setCameraMode(CameraMode mode) { m_camera_mode = mode; }

@@ -5,10 +5,10 @@
 #include <cstdint>
 #include <stdexcept>
 
-namespace Piccolo
+namespace SimpleEngine
 {
 
-    class LogSystem final
+    class LogSystem
     {
     public:
         enum class LogLevel : uint8_t

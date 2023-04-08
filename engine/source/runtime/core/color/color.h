@@ -1,12 +1,11 @@
 #pragma once
 #include "runtime/core/meta/reflection/reflection.h"
-
 #include "runtime/core/math/vector3.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     REFLECTION_TYPE(Color)
-    CLASS(Color, Fields)
+        CLASS(Color, Fields)
     {
         REFLECTION_BODY(Color);
 

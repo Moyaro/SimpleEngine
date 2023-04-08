@@ -13,12 +13,10 @@
 #include "runtime/function/framework/world/world_manager.h"
 #include "runtime/function/input/input_system.h"
 #include "runtime/function/render/render_camera.h"
-#include "runtime/function/render/render_system.h"
 
-namespace Piccolo
+
+namespace SimpleEngine
 {
-    void EditorSceneManager::initialize() {}
-
     void EditorSceneManager::tick(float delta_time)
     {
         std::shared_ptr<GObject> selected_gobject = getSelectedGObject().lock();
@@ -569,10 +567,5 @@ namespace Piccolo
         g_editor_global_context.m_render_system->createAxis(
             {m_translation_axis, m_rotation_axis, m_scale_aixs},
             {m_translation_axis.m_mesh_data, m_rotation_axis.m_mesh_data, m_scale_aixs.m_mesh_data});
-    }
-
-    size_t EditorSceneManager::getGuidOfPickedMesh(const Vector2& picked_uv) const
-    {
-        return g_editor_global_context.m_render_system->getGuidOfPickedMesh(picked_uv);
     }
 } // namespace Piccolo

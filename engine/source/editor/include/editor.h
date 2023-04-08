@@ -1,29 +1,27 @@
 #pragma once
 
-#include "runtime/core/math/vector2.h"
+#include<memory>
+#include "editor_ui.h"
+#include "editor_global_context.h"
 
-#include <memory>
+namespace SimpleEngine {
+	
+	class Engine;
+	
+	class Editor {
 
-namespace Piccolo
-{
-    class EditorUI;
-    class PiccoloEngine;
+		friend class EditorUI;
 
-    class PiccoloEditor 
-    {
-        friend class EditorUI;
+		public:
+			Editor();
+			void init(Engine* engine_runtime);
+			void clear() { g_editor_global_context.clear(); }
 
-    public:
-        PiccoloEditor();
-        virtual ~PiccoloEditor();
+			void run();
 
-        void initialize(PiccoloEngine* engine_runtime);
-        void clear();
+		protected:
+			std::shared_ptr<EditorUI> m_editor_ui;
+			Engine* m_engine_runtime{nullptr};
+	};
 
-        void run();
-
-    protected:
-        std::shared_ptr<EditorUI> m_editor_ui;
-        PiccoloEngine* m_engine_runtime{ nullptr };
-    };
-} // namespace Piccolo
+}

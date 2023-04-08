@@ -29,24 +29,22 @@
 #include <imgui_internal.h>
 #include <stb_image.h>
 
-namespace Piccolo
-{
-    std::vector<std::pair<std::string, bool>> g_editor_node_state_array;
-    int                                       g_node_depth = -1;
-    void                                      DrawVecControl(const std::string& label,
-                                                             Piccolo::Vector3&    values,
-                                                             float              resetValue  = 0.0f,
-                                                             float              columnWidth = 100.0f);
-    void                                      DrawVecControl(const std::string& label,
-                                                             Piccolo::Quaternion& values,
-                                                             float              resetValue  = 0.0f,
-                                                             float              columnWidth = 100.0f);
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
+namespace SimpleEngine {
+
+    std::vector<std::pair<std::string, bool>> g_editor_node_state_array;
+    int g_node_depth = -1;
+    void DrawVecControl(const std::string& label,Vector3& values,float resetValue = 0.0f,float columnWidth = 100.0f);
+    void DrawVecControl(const std::string& label,Quaternion& values,float resetValue = 0.0f,float columnWidth = 100.0f);
+
+	
     EditorUI::EditorUI()
     {
-        const auto& asset_folder            = g_runtime_global_context.m_config_manager->getAssetFolder();
+        const auto& asset_folder = g_runtime_global_context.m_config_manager->getAssetFolder();
         m_editor_ui_creator["TreeNodePush"] = [this](const std::string& name, void* value_ptr) -> void {
-            static ImGuiTableFlags flags      = ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings;
+            static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings;
             bool                   node_state = false;
             g_node_depth++;
             if (g_node_depth > 0)
@@ -91,36 +89,36 @@ namespace Piccolo
                 DrawVecControl("Scale", trans_ptr->m_scale);
 
                 trans_ptr->m_rotation.w = Math::cos(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.z / 2)) +
-                                          Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.z / 2));
+                    Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::cos(Math::degreesToRadians(degrees_val.z / 2)) +
+                    Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.z / 2));
                 trans_ptr->m_rotation.x = Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.z / 2)) -
-                                          Math::cos(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.z / 2));
+                    Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::cos(Math::degreesToRadians(degrees_val.z / 2)) -
+                    Math::cos(Math::degreesToRadians(degrees_val.x / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.z / 2));
                 trans_ptr->m_rotation.y = Math::cos(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.z / 2)) +
-                                          Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.z / 2));
+                    Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::cos(Math::degreesToRadians(degrees_val.z / 2)) +
+                    Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
+                    Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.z / 2));
                 trans_ptr->m_rotation.z = Math::cos(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.z / 2)) -
-                                          Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
-                                              Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
-                                              Math::cos(Math::degreesToRadians(degrees_val.z / 2));
+                    Math::cos(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.z / 2)) -
+                    Math::sin(Math::degreesToRadians(degrees_val.x / 2)) *
+                    Math::sin(Math::degreesToRadians(degrees_val.y / 2)) *
+                    Math::cos(Math::degreesToRadians(degrees_val.z / 2));
                 trans_ptr->m_rotation.normalise();
 
                 g_editor_global_context.m_scene_manager->drawSelectedEntityAxis();
             }
         };
         m_editor_ui_creator["bool"] = [this](const std::string& name, void* value_ptr)  -> void {
-            if(g_node_depth == -1)
+            if (g_node_depth == -1)
             {
                 std::string label = "##" + name;
                 ImGui::Text("%s", name.c_str());
@@ -129,7 +127,7 @@ namespace Piccolo
             }
             else
             {
-                if(g_editor_node_state_array[g_node_depth].second)
+                if (g_editor_node_state_array[g_node_depth].second)
                 {
                     std::string full_label = "##" + getLeafUINodeParentLabel() + name;
                     ImGui::Text("%s", name.c_str());
@@ -175,7 +173,7 @@ namespace Piccolo
         };
         m_editor_ui_creator["Vector3"] = [this](const std::string& name, void* value_ptr) -> void {
             Vector3* vec_ptr = static_cast<Vector3*>(value_ptr);
-            float    val[3]  = {vec_ptr->x, vec_ptr->y, vec_ptr->z};
+            float    val[3] = { vec_ptr->x, vec_ptr->y, vec_ptr->z };
             if (g_node_depth == -1)
             {
                 std::string label = "##" + name;
@@ -198,7 +196,7 @@ namespace Piccolo
         };
         m_editor_ui_creator["Quaternion"] = [this](const std::string& name, void* value_ptr) -> void {
             Quaternion* qua_ptr = static_cast<Quaternion*>(value_ptr);
-            float       val[4]  = {qua_ptr->x, qua_ptr->y, qua_ptr->z, qua_ptr->w};
+            float       val[4] = { qua_ptr->x, qua_ptr->y, qua_ptr->z, qua_ptr->w };
             if (g_node_depth == -1)
             {
                 std::string label = "##" + name;
@@ -254,6 +252,282 @@ namespace Piccolo
         };
     }
 
+    void EditorUI::setUIColorStyle()
+    {
+        ImGuiStyle* style = &ImGui::GetStyle();
+        ImVec4* colors = style->Colors;
+
+        colors[ImGuiCol_Text] = ImVec4(0.4745f, 0.4745f, 0.4745f, 1.00f);
+        colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+        colors[ImGuiCol_WindowBg] = ImVec4(0.0078f, 0.0078f, 0.0078f, 1.00f);
+        colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_PopupBg] = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
+        colors[ImGuiCol_Border] = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_FrameBg] = ImVec4(0.047f, 0.047f, 0.047f, 0.5411f);
+        colors[ImGuiCol_FrameBgHovered] = ImVec4(0.196f, 0.196f, 0.196f, 0.40f);
+        colors[ImGuiCol_FrameBgActive] = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
+        colors[ImGuiCol_TitleBg] = ImVec4(0.0039f, 0.0039f, 0.0039f, 1.00f);
+        colors[ImGuiCol_TitleBgActive] = ImVec4(0.0039f, 0.0039f, 0.0039f, 1.00f);
+        colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
+        colors[ImGuiCol_MenuBarBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+        colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+        colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+        colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+        colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+        colors[ImGuiCol_CheckMark] = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
+        colors[ImGuiCol_SliderGrab] = colors[ImGuiCol_CheckMark];
+        colors[ImGuiCol_SliderGrabActive] = ImVec4(0.3647f, 0.0392f, 0.2588f, 0.50f);
+        colors[ImGuiCol_Button] = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
+        colors[ImGuiCol_ButtonHovered] = ImVec4(0.0235f, 0.0235f, 0.0235f, 1.00f);
+        colors[ImGuiCol_ButtonActive] = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
+        colors[ImGuiCol_Header] = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
+        colors[ImGuiCol_HeaderHovered] = ImVec4(5.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.00f);
+        colors[ImGuiCol_HeaderActive] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+        colors[ImGuiCol_Separator] = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
+        colors[ImGuiCol_SeparatorHovered] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
+        colors[ImGuiCol_SeparatorActive] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
+        colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
+        colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+        colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+        colors[ImGuiCol_Tab] = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 1.00f);
+        colors[ImGuiCol_TabHovered] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 150.0f / 255.0f);
+        colors[ImGuiCol_TabActive] = ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 1.0f);
+        colors[ImGuiCol_TabUnfocused] = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 25.0f / 255.0f);
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 200.0f / 255.0f);
+        colors[ImGuiCol_DockingPreview] = ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 0.7f);
+        colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.00f);
+        colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+        colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+        colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+        colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+        colors[ImGuiCol_TableHeaderBg] = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
+        colors[ImGuiCol_TableBorderStrong] = ImVec4(2.0f / 255.0f, 2.0f / 255.0f, 2.0f / 255.0f, 1.0f);
+        colors[ImGuiCol_TableBorderLight] = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
+        colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        colors[ImGuiCol_TableRowBgAlt] = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
+        colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+        colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
+        colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+        colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+        colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+        colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    }
+
+    void EditorUI::onFileContentItemClicked(EditorFileNode* node)
+    {
+        if (node->m_file_type != "object")
+            return;
+
+        std::shared_ptr<Level> level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
+        if (level == nullptr)
+            return;
+
+        const unsigned int new_object_index = ++m_new_object_index_map[node->m_file_name];
+
+        ObjectInstanceRes new_object_instance_res;
+        new_object_instance_res.m_name =
+            "New_" + Path::getFilePureName(node->m_file_name) + "_" + std::to_string(new_object_index);
+        new_object_instance_res.m_definition =
+            g_runtime_global_context.m_asset_manager->getFullPath(node->m_file_path).generic_string();
+
+        size_t new_gobject_id = level->createObject(new_object_instance_res);
+        if (new_gobject_id != k_invalid_gobject_id)
+        {
+            g_editor_global_context.m_scene_manager->onGObjectSelected(new_gobject_id);
+        }
+    }
+
+    //***********************************初始化*************************************//
+
+    inline void windowContentScaleUpdate(float scale)
+    {
+#if defined(__GNUC__) && defined(__MACH__)
+        float font_scale = fmaxf(1.0f, scale);
+        ImGui::GetIO().FontGlobalScale = 1.0f / font_scale;
+#endif
+        // TOOD: Reload fonts if DPI scale is larger than previous font loading DPI scale
+    }
+
+    inline void windowContentScaleCallback(GLFWwindow* window, float x_scale, float y_scale)
+    {
+        windowContentScaleUpdate(fmaxf(x_scale, y_scale));
+    }
+
+    void EditorUI::init(WindowUIInitInfo init_info) {
+        std::shared_ptr<ConfigManager> config_manager = g_runtime_global_context.m_config_manager;
+
+        // create imgui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+
+        // set ui content scale
+        float x_scale, y_scale;
+        glfwGetWindowContentScale(init_info.window_system->getWindow(), &x_scale, &y_scale);
+        float content_scale = fmaxf(1.0f, fmaxf(x_scale, y_scale));
+        windowContentScaleUpdate(content_scale);
+        glfwSetWindowContentScaleCallback(init_info.window_system->getWindow(), windowContentScaleCallback);
+
+        // load font for imgui
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        io.ConfigDockingAlwaysTabBar = true;
+        io.ConfigWindowsMoveFromTitleBarOnly = true;
+        io.Fonts->AddFontFromFileTTF(config_manager->getEditorFontPath().generic_string().data(), content_scale * 16, nullptr, nullptr);
+        io.Fonts->Build();
+
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.WindowPadding = ImVec2(1.0, 0);
+        style.FramePadding = ImVec2(14.0, 2.0f);
+        style.ChildBorderSize = 0.0f;
+        style.FrameRounding = 5.0f;
+        style.FrameBorderSize = 1.5f;
+
+        // set imgui color style
+        setUIColorStyle();
+
+        // 安装窗口icon
+        GLFWimage   window_icon[2];
+        //获取图像地址
+        std::string big_icon_path_string = config_manager->getEditorBigIconPath().generic_string();
+        std::string small_icon_path_string = config_manager->getEditorSmallIconPath().generic_string();
+        //载入图像
+        window_icon[0].pixels = stbi_load(big_icon_path_string.data(), &window_icon[0].width, &window_icon[0].height, 0, STBI_rgb_alpha);//地址，图像宽、高、颜色通道、STBI_rgb_alpha：载入alpha通道，每个像素用4字节存储
+        window_icon[1].pixels = stbi_load(small_icon_path_string.data(), &window_icon[1].width, &window_icon[1].height, 0, STBI_rgb_alpha);
+        std::cout << window_icon[0].height << window_icon[0].width << std::endl;
+        //设置窗口icon
+        glfwSetWindowIcon(init_info.window_system->getWindow(), 2, window_icon);
+        stbi_image_free(window_icon[0].pixels);
+        stbi_image_free(window_icon[1].pixels);
+
+        // initialize imgui vulkan render backend
+        init_info.render_system->initializeUIRenderBackend(this);
+    }
+
+    //***********************************创建UI*************************************//
+
+    void EditorUI::buildEditorFileAssetsUITree(EditorFileNode* node)
+    {
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        const bool is_folder = (node->m_child_nodes.size() > 0);
+        if (is_folder)
+        {
+            bool open = ImGui::TreeNodeEx(node->m_file_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+            ImGui::TableNextColumn();
+            ImGui::SetNextItemWidth(100.0f);
+            ImGui::TextUnformatted(node->m_file_type.c_str());
+            if (open)
+            {
+                for (int child_n = 0; child_n < node->m_child_nodes.size(); child_n++)
+                    buildEditorFileAssetsUITree(node->m_child_nodes[child_n].get());
+                ImGui::TreePop();
+            }
+        }
+        else
+        {
+            ImGui::TreeNodeEx(node->m_file_name.c_str(),
+                ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen |
+                ImGuiTreeNodeFlags_SpanFullWidth);
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            {
+                onFileContentItemClicked(node);
+            }
+            ImGui::TableNextColumn();
+            ImGui::SetNextItemWidth(100.0f);
+            ImGui::TextUnformatted(node->m_file_type.c_str());
+        }
+    }
+
+    void EditorUI::createClassUI(Reflection::ReflectionInstance& instance)
+    {
+        Reflection::ReflectionInstance* reflection_instance;
+        int count = instance.m_meta.getBaseClassReflectionInstanceList(reflection_instance, instance.m_instance);
+        for (int index = 0; index < count; index++)
+        {
+            createClassUI(reflection_instance[index]);
+        }
+        createLeafNodeUI(instance);
+
+        if (count > 0)
+            delete[] reflection_instance;
+    }
+
+    void EditorUI::createLeafNodeUI(Reflection::ReflectionInstance& instance)
+    {
+        Reflection::FieldAccessor* fields;
+        int                        fields_count = instance.m_meta.getFieldsList(fields);
+
+        for (size_t index = 0; index < fields_count; index++)
+        {
+            auto field = fields[index];
+            if (field.isArrayType())
+            {
+                Reflection::ArrayAccessor array_accessor;
+                if (Reflection::TypeMeta::newArrayAccessorFromName(field.getFieldTypeName(), array_accessor))
+                {
+                    void* field_instance = field.get(instance.m_instance);
+                    int   array_count = array_accessor.getSize(field_instance);
+                    m_editor_ui_creator["TreeNodePush"](
+                        std::string(field.getFieldName()) + "[" + std::to_string(array_count) + "]", nullptr);
+                    auto item_type_meta_item =
+                        Reflection::TypeMeta::newMetaFromName(array_accessor.getElementTypeName());
+                    auto item_ui_creator_iterator = m_editor_ui_creator.find(item_type_meta_item.getTypeName());
+                    for (int index = 0; index < array_count; index++)
+                    {
+                        if (item_ui_creator_iterator == m_editor_ui_creator.end())
+                        {
+                            m_editor_ui_creator["TreeNodePush"]("[" + std::to_string(index) + "]", nullptr);
+                            auto object_instance = Reflection::ReflectionInstance(Reflection::TypeMeta::newMetaFromName(item_type_meta_item.getTypeName().c_str()),
+                                array_accessor.get(index, field_instance));
+                            createClassUI(object_instance);
+                            m_editor_ui_creator["TreeNodePop"]("[" + std::to_string(index) + "]", nullptr);
+                        }
+                        else
+                        {
+                            if (item_ui_creator_iterator == m_editor_ui_creator.end())
+                            {
+                                continue;
+                            }
+                            m_editor_ui_creator[item_type_meta_item.getTypeName()](
+                                "[" + std::to_string(index) + "]", array_accessor.get(index, field_instance));
+                        }
+                    }
+                    m_editor_ui_creator["TreeNodePop"](field.getFieldName(), nullptr);
+                }
+            }
+            auto ui_creator_iterator = m_editor_ui_creator.find(field.getFieldTypeName());
+            if (ui_creator_iterator == m_editor_ui_creator.end())
+            {
+                Reflection::TypeMeta field_meta =
+                    Reflection::TypeMeta::newMetaFromName(field.getFieldTypeName());
+                if (field.getTypeMeta(field_meta))
+                {
+                    auto child_instance =
+                        Reflection::ReflectionInstance(field_meta, field.get(instance.m_instance));
+                    m_editor_ui_creator["TreeNodePush"](field_meta.getTypeName(), nullptr);
+                    createClassUI(child_instance);
+                    m_editor_ui_creator["TreeNodePop"](field_meta.getTypeName(), nullptr);
+                }
+                else
+                {
+                    if (ui_creator_iterator == m_editor_ui_creator.end())
+                    {
+                        continue;
+                    }
+                    m_editor_ui_creator[field.getFieldTypeName()](field.getFieldName(),
+                        field.get(instance.m_instance));
+                }
+            }
+            else
+            {
+                m_editor_ui_creator[field.getFieldTypeName()](field.getFieldName(),
+                    field.get(instance.m_instance));
+            }
+        }
+        delete[] fields;
+    }
+
     std::string EditorUI::getLeafUINodeParentLabel()
     {
         std::string parent_label;
@@ -264,6 +538,8 @@ namespace Piccolo
         }
         return parent_label;
     }
+
+    //***********************************展示UI界面*************************************//
 
     void EditorUI::showEditorUI()
     {
@@ -276,11 +552,11 @@ namespace Piccolo
 
     void EditorUI::showEditorMenu(bool* p_open)
     {
-        ImGuiDockNodeFlags dock_flags   = ImGuiDockNodeFlags_DockSpace;
+        ImGuiDockNodeFlags dock_flags = ImGuiDockNodeFlags_DockSpace;
         ImGuiWindowFlags   window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
-                                        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-                                        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
-                                        ImGuiConfigFlags_NoMouseCursorChange | ImGuiWindowFlags_NoBringToFrontOnFocus;
+            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
+            ImGuiConfigFlags_NoMouseCursorChange | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(main_viewport->WorkPos, ImGuiCond_Always);
@@ -298,9 +574,9 @@ namespace Piccolo
 
             ImGui::DockBuilderAddNode(main_docking_id, dock_flags);
             ImGui::DockBuilderSetNodePos(main_docking_id,
-                                         ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y + 18.0f));
+                ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y + 18.0f));
             ImGui::DockBuilderSetNodeSize(main_docking_id,
-                                          ImVec2((float)window_size[0], (float)window_size[1] - 18.0f));
+                ImVec2((float)window_size[0], (float)window_size[1] - 18.0f));
 
             ImGuiID center = main_docking_id;
             ImGuiID left;
@@ -339,18 +615,6 @@ namespace Piccolo
                 }
                 if (ImGui::BeginMenu("Debug"))
                 {
-                    if (ImGui::BeginMenu("Animation"))
-                    {
-                        if (ImGui::MenuItem(g_runtime_global_context.m_render_debug_config->animation.show_skeleton ? "off skeleton" : "show skeleton"))
-                        {
-                            g_runtime_global_context.m_render_debug_config->animation.show_skeleton = !g_runtime_global_context.m_render_debug_config->animation.show_skeleton;
-                        }
-                        if (ImGui::MenuItem(g_runtime_global_context.m_render_debug_config->animation.show_bone_name ? "off bone name" : "show bone name"))
-                        {
-                            g_runtime_global_context.m_render_debug_config->animation.show_bone_name = !g_runtime_global_context.m_render_debug_config->animation.show_bone_name;
-                        }
-                        ImGui::EndMenu();
-                    }
                     if (ImGui::BeginMenu("Camera"))
                     {
                         if (ImGui::MenuItem(g_runtime_global_context.m_render_debug_config->camera.show_runtime_info ? "off runtime info" : "show runtime info"))
@@ -371,7 +635,7 @@ namespace Piccolo
                 }
                 if (ImGui::MenuItem("Exit"))
                 {
-                    g_editor_global_context.m_engine_runtime->shutdownEngine();
+                    g_editor_global_context.m_engine_runtime->closeEngine();
                     exit(0);
                 }
                 ImGui::EndMenu();
@@ -414,12 +678,12 @@ namespace Piccolo
         for (auto& id_object_pair : all_gobjects)
         {
             const GObjectID          object_id = id_object_pair.first;
-            std::shared_ptr<GObject> object    = id_object_pair.second;
-            const std::string        name      = object->getName();
+            std::shared_ptr<GObject> object = id_object_pair.second;
+            const std::string        name = object->getName();
             if (name.size() > 0)
             {
                 if (ImGui::Selectable(name.c_str(),
-                                      g_editor_global_context.m_scene_manager->getSelectedObjectID() == object_id))
+                    g_editor_global_context.m_scene_manager->getSelectedObjectID() == object_id))
                 {
                     if (g_editor_global_context.m_scene_manager->getSelectedObjectID() != object_id)
                     {
@@ -434,96 +698,6 @@ namespace Piccolo
             }
         }
         ImGui::End();
-    }
-
-    void EditorUI::createClassUI(Reflection::ReflectionInstance& instance)
-    {
-        Reflection::ReflectionInstance* reflection_instance;
-        int count = instance.m_meta.getBaseClassReflectionInstanceList(reflection_instance, instance.m_instance);
-        for (int index = 0; index < count; index++)
-        {
-            createClassUI(reflection_instance[index]);
-        }
-        createLeafNodeUI(instance);
-
-        if (count > 0)
-            delete[] reflection_instance;
-    }
-
-    void EditorUI::createLeafNodeUI(Reflection::ReflectionInstance& instance)
-    {
-        Reflection::FieldAccessor* fields;
-        int                        fields_count = instance.m_meta.getFieldsList(fields);
-
-        for (size_t index = 0; index < fields_count; index++)
-        {
-            auto field = fields[index];
-            if (field.isArrayType())
-            {
-                Reflection::ArrayAccessor array_accessor;
-                if (Reflection::TypeMeta::newArrayAccessorFromName(field.getFieldTypeName(), array_accessor))
-                {
-                    void* field_instance = field.get(instance.m_instance);
-                    int   array_count    = array_accessor.getSize(field_instance);
-                    m_editor_ui_creator["TreeNodePush"](
-                        std::string(field.getFieldName()) + "[" + std::to_string(array_count) + "]", nullptr);
-                    auto item_type_meta_item =
-                        Reflection::TypeMeta::newMetaFromName(array_accessor.getElementTypeName());
-                    auto item_ui_creator_iterator = m_editor_ui_creator.find(item_type_meta_item.getTypeName());
-                    for (int index = 0; index < array_count; index++)
-                    {
-                        if (item_ui_creator_iterator == m_editor_ui_creator.end())
-                        {
-                            m_editor_ui_creator["TreeNodePush"]("[" + std::to_string(index) + "]", nullptr);
-                            auto object_instance = Reflection::ReflectionInstance(
-                                Piccolo::Reflection::TypeMeta::newMetaFromName(item_type_meta_item.getTypeName().c_str()),
-                                array_accessor.get(index, field_instance));
-                            createClassUI(object_instance);
-                            m_editor_ui_creator["TreeNodePop"]("[" + std::to_string(index) + "]", nullptr);
-                        }
-                        else
-                        {
-                            if (item_ui_creator_iterator == m_editor_ui_creator.end())
-                            {
-                                continue;
-                            }
-                            m_editor_ui_creator[item_type_meta_item.getTypeName()](
-                                "[" + std::to_string(index) + "]", array_accessor.get(index, field_instance));
-                        }
-                    }
-                    m_editor_ui_creator["TreeNodePop"](field.getFieldName(), nullptr);
-                }
-            }
-            auto ui_creator_iterator = m_editor_ui_creator.find(field.getFieldTypeName());
-            if (ui_creator_iterator == m_editor_ui_creator.end())
-            {
-                Reflection::TypeMeta field_meta =
-                    Reflection::TypeMeta::newMetaFromName(field.getFieldTypeName());
-                if (field.getTypeMeta(field_meta))
-                {
-                    auto child_instance =
-                        Reflection::ReflectionInstance(field_meta, field.get(instance.m_instance));
-                    m_editor_ui_creator["TreeNodePush"](field_meta.getTypeName(), nullptr);
-                    createClassUI(child_instance);
-                    m_editor_ui_creator["TreeNodePop"](field_meta.getTypeName(), nullptr);
-                }
-                else
-                {
-                    if (ui_creator_iterator == m_editor_ui_creator.end())
-                    {
-                        continue;
-                    }
-                    m_editor_ui_creator[field.getFieldTypeName()](field.getFieldName(),
-                                                                         field.get(instance.m_instance));
-                }
-            }
-            else
-            {
-                m_editor_ui_creator[field.getFieldTypeName()](field.getFieldName(),
-                                                                     field.get(instance.m_instance));
-            }
-        }
-        delete[] fields;
     }
 
     void EditorUI::showEditorDetailWindow(bool* p_open)
@@ -557,13 +731,12 @@ namespace Piccolo
         ImGui::SameLine();
         ImGui::InputText("##Name", cname, IM_ARRAYSIZE(cname), ImGuiInputTextFlags_ReadOnly);
 
-        static ImGuiTableFlags flags                      = ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings;
-        auto&&                 selected_object_components = selected_object->getComponents();
+        static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings;
+        auto&& selected_object_components = selected_object->getComponents();
         for (auto component_ptr : selected_object_components)
         {
             m_editor_ui_creator["TreeNodePush"](("<" + component_ptr.getTypeName() + ">").c_str(), nullptr);
-            auto object_instance = Reflection::ReflectionInstance(
-                Piccolo::Reflection::TypeMeta::newMetaFromName(component_ptr.getTypeName().c_str()),
+            auto object_instance = Reflection::ReflectionInstance(Reflection::TypeMeta::newMetaFromName(component_ptr.getTypeName().c_str()),
                 component_ptr.operator->());
             createClassUI(object_instance);
             m_editor_ui_creator["TreeNodePop"](("<" + component_ptr.getTypeName() + ">").c_str(), nullptr);
@@ -587,8 +760,8 @@ namespace Piccolo
         }
 
         static ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH |
-                                       ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
-                                       ImGuiTableFlags_NoBordersInBody;
+            ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg |
+            ImGuiTableFlags_NoBordersInBody;
 
         if (ImGui::BeginTable("File Content", 2, flags))
         {
@@ -616,7 +789,7 @@ namespace Piccolo
 
     void EditorUI::showEditorGameWindow(bool* p_open)
     {
-        ImGuiIO&         io           = ImGui::GetIO();
+        ImGuiIO& io = ImGui::GetIO();
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
 
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
@@ -630,29 +803,29 @@ namespace Piccolo
             return;
         }
 
-        static bool trans_button_ckecked  = false;
+        static bool trans_button_ckecked = false;
         static bool rotate_button_ckecked = false;
-        static bool scale_button_ckecked  = false;
+        static bool scale_button_ckecked = false;
 
         switch (g_editor_global_context.m_scene_manager->getEditorAxisMode())
         {
-            case EditorAxisMode::TranslateMode:
-                trans_button_ckecked  = true;
-                rotate_button_ckecked = false;
-                scale_button_ckecked  = false;
-                break;
-            case EditorAxisMode::RotateMode:
-                trans_button_ckecked  = false;
-                rotate_button_ckecked = true;
-                scale_button_ckecked  = false;
-                break;
-            case EditorAxisMode::ScaleMode:
-                trans_button_ckecked  = false;
-                rotate_button_ckecked = false;
-                scale_button_ckecked  = true;
-                break;
-            default:
-                break;
+        case EditorAxisMode::TranslateMode:
+            trans_button_ckecked = true;
+            rotate_button_ckecked = false;
+            scale_button_ckecked = false;
+            break;
+        case EditorAxisMode::RotateMode:
+            trans_button_ckecked = false;
+            rotate_button_ckecked = true;
+            scale_button_ckecked = false;
+            break;
+        case EditorAxisMode::ScaleMode:
+            trans_button_ckecked = false;
+            rotate_button_ckecked = false;
+            scale_button_ckecked = true;
+            break;
+        default:
+            break;
         }
 
         if (ImGui::BeginMenuBar())
@@ -718,8 +891,8 @@ namespace Piccolo
         else
         {
             ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f),
-                               "Current editor camera move speed: [%f]",
-                               g_editor_global_context.m_input_manager->getCameraSpeed());
+                "Current editor camera move speed: [%f]",
+                g_editor_global_context.m_input_manager->getCameraSpeed());
         }
 
         // GetWindowPos() ----->  X--------------------------------------------O
@@ -773,7 +946,7 @@ namespace Piccolo
             ImGui::PushID(string_id);
             ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
             ImGui::PushStyleColor(ImGuiCol_Button,
-                                  ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
+                ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
             ImGui::Button(string_id);
@@ -791,193 +964,9 @@ namespace Piccolo
         }
     }
 
-    void EditorUI::buildEditorFileAssetsUITree(EditorFileNode* node)
-    {
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        const bool is_folder = (node->m_child_nodes.size() > 0);
-        if (is_folder)
-        {
-            bool open = ImGui::TreeNodeEx(node->m_file_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
-            ImGui::TableNextColumn();
-            ImGui::SetNextItemWidth(100.0f);
-            ImGui::TextUnformatted(node->m_file_type.c_str());
-            if (open)
-            {
-                for (int child_n = 0; child_n < node->m_child_nodes.size(); child_n++)
-                    buildEditorFileAssetsUITree(node->m_child_nodes[child_n].get());
-                ImGui::TreePop();
-            }
-        }
-        else
-        {
-            ImGui::TreeNodeEx(node->m_file_name.c_str(),
-                              ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen |
-                                  ImGuiTreeNodeFlags_SpanFullWidth);
-            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-            {
-                onFileContentItemClicked(node);
-            }
-            ImGui::TableNextColumn();
-            ImGui::SetNextItemWidth(100.0f);
-            ImGui::TextUnformatted(node->m_file_type.c_str());
-        }
-    }
+    //***********************************绘制向量控制*************************************//
 
-    void EditorUI::onFileContentItemClicked(EditorFileNode* node)
-    {
-        if (node->m_file_type != "object")
-            return;
-
-        std::shared_ptr<Level> level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
-        if (level == nullptr)
-            return;
-
-        const unsigned int new_object_index = ++m_new_object_index_map[node->m_file_name];
-
-        ObjectInstanceRes new_object_instance_res;
-        new_object_instance_res.m_name =
-            "New_" + Path::getFilePureName(node->m_file_name) + "_" + std::to_string(new_object_index);
-        new_object_instance_res.m_definition =
-            g_runtime_global_context.m_asset_manager->getFullPath(node->m_file_path).generic_string();
-
-        size_t new_gobject_id = level->createObject(new_object_instance_res);
-        if (new_gobject_id != k_invalid_gobject_id)
-        {
-            g_editor_global_context.m_scene_manager->onGObjectSelected(new_gobject_id);
-        }
-    }
-
-    inline void windowContentScaleUpdate(float scale)
-    {
-#if defined(__GNUC__) && defined(__MACH__)
-        float font_scale               = fmaxf(1.0f, scale);
-        ImGui::GetIO().FontGlobalScale = 1.0f / font_scale;
-#endif
-        // TOOD: Reload fonts if DPI scale is larger than previous font loading DPI scale
-    }
-
-    inline void windowContentScaleCallback(GLFWwindow* window, float x_scale, float y_scale)
-    {
-        windowContentScaleUpdate(fmaxf(x_scale, y_scale));
-    }
-
-    void EditorUI::initialize(WindowUIInitInfo init_info)
-    {
-        std::shared_ptr<ConfigManager> config_manager = g_runtime_global_context.m_config_manager;
-        ASSERT(config_manager);
-
-        // create imgui context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-
-        // set ui content scale
-        float x_scale, y_scale;
-        glfwGetWindowContentScale(init_info.window_system->getWindow(), &x_scale, &y_scale);
-        float content_scale = fmaxf(1.0f, fmaxf(x_scale, y_scale));
-        windowContentScaleUpdate(content_scale);
-        glfwSetWindowContentScaleCallback(init_info.window_system->getWindow(), windowContentScaleCallback);
-
-        // load font for imgui
-        ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigDockingAlwaysTabBar         = true;
-        io.ConfigWindowsMoveFromTitleBarOnly = true;
-        io.Fonts->AddFontFromFileTTF(
-            config_manager->getEditorFontPath().generic_string().data(), content_scale * 16, nullptr, nullptr);
-        io.Fonts->Build();
-
-        ImGuiStyle& style     = ImGui::GetStyle();
-        style.WindowPadding   = ImVec2(1.0, 0);
-        style.FramePadding    = ImVec2(14.0, 2.0f);
-        style.ChildBorderSize = 0.0f;
-        style.FrameRounding   = 5.0f;
-        style.FrameBorderSize = 1.5f;
-
-        // set imgui color style
-        setUIColorStyle();
-
-        // setup window icon
-        GLFWimage   window_icon[2];
-        std::string big_icon_path_string   = config_manager->getEditorBigIconPath().generic_string();
-        std::string small_icon_path_string = config_manager->getEditorSmallIconPath().generic_string();
-        window_icon[0].pixels =
-            stbi_load(big_icon_path_string.data(), &window_icon[0].width, &window_icon[0].height, 0, 4);
-        window_icon[1].pixels =
-            stbi_load(small_icon_path_string.data(), &window_icon[1].width, &window_icon[1].height, 0, 4);
-        glfwSetWindowIcon(init_info.window_system->getWindow(), 2, window_icon);
-        stbi_image_free(window_icon[0].pixels);
-        stbi_image_free(window_icon[1].pixels);
-
-        // initialize imgui vulkan render backend
-        init_info.render_system->initializeUIRenderBackend(this);
-    }
-
-    void EditorUI::setUIColorStyle()
-    {
-        ImGuiStyle* style  = &ImGui::GetStyle();
-        ImVec4*     colors = style->Colors;
-
-        colors[ImGuiCol_Text]                  = ImVec4(0.4745f, 0.4745f, 0.4745f, 1.00f);
-        colors[ImGuiCol_TextDisabled]          = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-        colors[ImGuiCol_WindowBg]              = ImVec4(0.0078f, 0.0078f, 0.0078f, 1.00f);
-        colors[ImGuiCol_ChildBg]               = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-        colors[ImGuiCol_PopupBg]               = ImVec4(0.08f, 0.08f, 0.08f, 0.94f);
-        colors[ImGuiCol_Border]                = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-        colors[ImGuiCol_BorderShadow]          = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-        colors[ImGuiCol_FrameBg]               = ImVec4(0.047f, 0.047f, 0.047f, 0.5411f);
-        colors[ImGuiCol_FrameBgHovered]        = ImVec4(0.196f, 0.196f, 0.196f, 0.40f);
-        colors[ImGuiCol_FrameBgActive]         = ImVec4(0.294f, 0.294f, 0.294f, 0.67f);
-        colors[ImGuiCol_TitleBg]               = ImVec4(0.0039f, 0.0039f, 0.0039f, 1.00f);
-        colors[ImGuiCol_TitleBgActive]         = ImVec4(0.0039f, 0.0039f, 0.0039f, 1.00f);
-        colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(0.00f, 0.00f, 0.00f, 0.50f);
-        colors[ImGuiCol_MenuBarBg]             = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-        colors[ImGuiCol_ScrollbarBg]           = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
-        colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
-        colors[ImGuiCol_ScrollbarGrabHovered]  = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-        colors[ImGuiCol_ScrollbarGrabActive]   = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
-        colors[ImGuiCol_CheckMark]             = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
-        colors[ImGuiCol_SliderGrab]            = colors[ImGuiCol_CheckMark];
-        colors[ImGuiCol_SliderGrabActive]      = ImVec4(0.3647f, 0.0392f, 0.2588f, 0.50f);
-        colors[ImGuiCol_Button]                = ImVec4(0.0117f, 0.0117f, 0.0117f, 1.00f);
-        colors[ImGuiCol_ButtonHovered]         = ImVec4(0.0235f, 0.0235f, 0.0235f, 1.00f);
-        colors[ImGuiCol_ButtonActive]          = ImVec4(0.0353f, 0.0196f, 0.0235f, 1.00f);
-        colors[ImGuiCol_Header]                = ImVec4(0.1137f, 0.0235f, 0.0745f, 0.588f);
-        colors[ImGuiCol_HeaderHovered]         = ImVec4(5.0f / 255.0f, 5.0f / 255.0f, 5.0f / 255.0f, 1.00f);
-        colors[ImGuiCol_HeaderActive]          = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-        colors[ImGuiCol_Separator]             = ImVec4(0.0f, 0.0f, 0.0f, 0.50f);
-        colors[ImGuiCol_SeparatorHovered]      = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
-        colors[ImGuiCol_SeparatorActive]       = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 1.00f);
-        colors[ImGuiCol_ResizeGrip]            = ImVec4(0.26f, 0.59f, 0.98f, 0.20f);
-        colors[ImGuiCol_ResizeGripHovered]     = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-        colors[ImGuiCol_ResizeGripActive]      = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
-        colors[ImGuiCol_Tab]                   = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 1.00f);
-        colors[ImGuiCol_TabHovered]            = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 150.0f / 255.0f);
-        colors[ImGuiCol_TabActive]             = ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 1.0f);
-        colors[ImGuiCol_TabUnfocused]          = ImVec4(45.0f / 255.0f, 7.0f / 255.0f, 26.0f / 255.0f, 25.0f / 255.0f);
-        colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(6.0f / 255.0f, 6.0f / 255.0f, 8.0f / 255.0f, 200.0f / 255.0f);
-        colors[ImGuiCol_DockingPreview]        = ImVec4(47.0f / 255.0f, 6.0f / 255.0f, 29.0f / 255.0f, 0.7f);
-        colors[ImGuiCol_DockingEmptyBg]        = ImVec4(0.20f, 0.20f, 0.20f, 0.00f);
-        colors[ImGuiCol_PlotLines]             = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-        colors[ImGuiCol_PlotLinesHovered]      = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-        colors[ImGuiCol_PlotHistogram]         = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-        colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-        colors[ImGuiCol_TableHeaderBg]         = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
-        colors[ImGuiCol_TableBorderStrong]     = ImVec4(2.0f / 255.0f, 2.0f / 255.0f, 2.0f / 255.0f, 1.0f);
-        colors[ImGuiCol_TableBorderLight]      = ImVec4(0.23f, 0.23f, 0.25f, 1.00f);
-        colors[ImGuiCol_TableRowBg]            = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-        colors[ImGuiCol_TableRowBgAlt]         = ImVec4(1.00f, 1.00f, 1.00f, 0.06f);
-        colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-        colors[ImGuiCol_DragDropTarget]        = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-        colors[ImGuiCol_NavHighlight]          = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-        colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-        colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-        colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
-    }
-
-    void EditorUI::preRender() { showEditorUI(); }
-
-    void DrawVecControl(const std::string& label, Piccolo::Vector3& values, float resetValue, float columnWidth)
+    void DrawVecControl(const std::string& label, Vector3& values, float resetValue, float columnWidth)
     {
         ImGui::PushID(label.c_str());
 
@@ -987,14 +976,14 @@ namespace Piccolo
         ImGui::NextColumn();
 
         ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2 {0, 0});
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
         float  lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-        ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.8f, 0.1f, 0.15f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.9f, 0.2f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.8f, 0.1f, 0.15f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
         if (ImGui::Button("X", buttonSize))
             values.x = resetValue;
         ImGui::PopStyleColor(3);
@@ -1004,9 +993,9 @@ namespace Piccolo
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.2f, 0.45f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.3f, 0.55f, 0.3f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.2f, 0.45f, 0.2f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.45f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.55f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.45f, 0.2f, 1.0f });
         if (ImGui::Button("Y", buttonSize))
             values.y = resetValue;
         ImGui::PopStyleColor(3);
@@ -1016,9 +1005,9 @@ namespace Piccolo
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.1f, 0.25f, 0.8f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.2f, 0.35f, 0.9f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.1f, 0.25f, 0.8f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
         if (ImGui::Button("Z", buttonSize))
             values.z = resetValue;
         ImGui::PopStyleColor(3);
@@ -1033,7 +1022,7 @@ namespace Piccolo
         ImGui::PopID();
     }
 
-    void DrawVecControl(const std::string& label, Piccolo::Quaternion& values, float resetValue, float columnWidth)
+    void DrawVecControl(const std::string& label, Quaternion& values, float resetValue, float columnWidth)
     {
         ImGui::PushID(label.c_str());
 
@@ -1043,14 +1032,14 @@ namespace Piccolo
         ImGui::NextColumn();
 
         ImGui::PushMultiItemsWidths(4, ImGui::CalcItemWidth());
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2 {0, 0});
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
         float  lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-        ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.8f, 0.1f, 0.15f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.9f, 0.2f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.8f, 0.1f, 0.15f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
         if (ImGui::Button("X", buttonSize))
             values.x = resetValue;
         ImGui::PopStyleColor(3);
@@ -1060,9 +1049,9 @@ namespace Piccolo
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.2f, 0.45f, 0.2f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.3f, 0.55f, 0.3f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.2f, 0.45f, 0.2f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.45f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.55f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.45f, 0.2f, 1.0f });
         if (ImGui::Button("Y", buttonSize))
             values.y = resetValue;
         ImGui::PopStyleColor(3);
@@ -1072,9 +1061,9 @@ namespace Piccolo
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.1f, 0.25f, 0.8f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.2f, 0.35f, 0.9f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.1f, 0.25f, 0.8f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
         if (ImGui::Button("Z", buttonSize))
             values.z = resetValue;
         ImGui::PopStyleColor(3);
@@ -1084,9 +1073,9 @@ namespace Piccolo
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4 {0.5f, 0.25f, 0.5f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4 {0.6f, 0.35f, 0.6f, 1.0f});
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4 {0.5f, 0.25f, 0.5f, 1.0f});
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.5f, 0.25f, 0.5f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.6f, 0.35f, 0.6f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.5f, 0.25f, 0.5f, 1.0f });
         if (ImGui::Button("W", buttonSize))
             values.w = resetValue;
         ImGui::PopStyleColor(3);
@@ -1100,4 +1089,4 @@ namespace Piccolo
         ImGui::Columns(1);
         ImGui::PopID();
     }
-} // namespace Piccolo
+}

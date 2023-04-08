@@ -3,8 +3,12 @@
 #include "runtime/function/render/render_entity.h"
 #include "runtime/function/render/render_type.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
+    /// <summary>
+    /// ÒÆ¶¯/Ðý×ª/Ëõ·Å
+    /// </summary>
+ 
     class EditorTranslationAxis : public RenderEntity
     {
     public:
@@ -25,4 +29,4 @@ namespace Piccolo
         EditorScaleAxis();
         RenderMeshData m_mesh_data;
     };
-} // namespace Piccolo
+}

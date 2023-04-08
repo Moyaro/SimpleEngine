@@ -2,7 +2,7 @@
 
 #include "runtime/core/math/math.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     enum class GameCommand : unsigned int
     {
@@ -27,7 +27,7 @@ namespace Piccolo
         void onKey(int key, int scancode, int action, int mods);
         void onCursorPos(double current_cursor_x, double current_cursor_y);
 
-        void initialize();
+        void init();
         void tick();
         void clear();
 
@@ -50,4 +50,4 @@ namespace Piccolo
         int m_last_cursor_x {0};
         int m_last_cursor_y {0};
     };
-} // namespace Piccolo
+}

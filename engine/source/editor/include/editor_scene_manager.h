@@ -1,15 +1,15 @@
 #pragma once
 
 #include "editor/include/axis.h"
-
+#include "runtime/function/render/render_system.h"
 #include "runtime/function/framework/object/object.h"
 #include "runtime/function/render/render_object.h"
 
 #include <memory>
 
-namespace Piccolo
+namespace SimpleEngine
 {
-    class PiccoloEditor;
+    class EngineEditor;
     class RenderCamera;
     class RenderEntity;
 
@@ -24,7 +24,7 @@ namespace Piccolo
     class EditorSceneManager
     {
     public:
-        void initialize();
+        void init(){}
         void tick(float delta_time);
 
     public:
@@ -47,7 +47,7 @@ namespace Piccolo
 
         void setEditorCamera(std::shared_ptr<RenderCamera> camera) { m_camera = camera; }
         void uploadAxisResource();
-        size_t getGuidOfPickedMesh(const Vector2& picked_uv) const;
+        size_t getGuidOfPickedMesh(const Vector2& picked_uv) const{ return g_editor_global_context.m_render_system->getGuidOfPickedMesh(picked_uv); }
 
     public:
         std::shared_ptr<RenderCamera> getEditorCamera() { return m_camera; };

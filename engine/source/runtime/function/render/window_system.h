@@ -1,34 +1,40 @@
 #pragma once
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
 #include <array>
 #include <functional>
 #include <vector>
 
-namespace Piccolo
-{
-    struct WindowCreateInfo
-    {
-        int         width {1280};
-        int         height {720};
-        const char* title {"Piccolo"};
-        bool        is_fullscreen {false};
-    };
+namespace SimpleEngine {
+	
+	//窗口创建用信息
+	struct WindowCreateInfo
+	{
+		int width{ 1280 };
+		int height{ 720 };
+		const char* title{ "SimpleEngine" };
+		bool is_full_screen{ false };
+	};
 
-    class WindowSystem
-    {
-    public:
-        WindowSystem() = default;
-        ~WindowSystem();
-        void               initialize(WindowCreateInfo create_info);
-        void               pollEvents() const;
-        bool               shouldClose() const;
-        void               setTitle(const char* title);
-        GLFWwindow*        getWindow() const;
-        std::array<int, 2> getWindowSize() const;
+	/// <summary>
+	/// 窗口管理、控制
+	/// </summary>
+	class WindowSystem
+	{
+	public:
+		~WindowSystem();//删窗口，停glfw
+		void init(WindowCreateInfo& create_info);//glfw初始化，窗口初始化，创建窗口
 
+		//窗口控制
+		void setTitle(const char* title) { glfwSetWindowTitle(m_window, title); }
+		void pollEvents() { glfwPollEvents(); }
+		bool shouldClose() { return glfwWindowShouldClose(m_window); }
+		
+		//获取窗口、窗口大小
+		GLFWwindow* getWindow() { return m_window; }
+		std::array<int, 2> getWindowSize() { return { m_width, m_height }; }
+
+        //回调函数类型
         typedef std::function<void()>                   onResetFunc;
         typedef std::function<void(int, int, int, int)> onKeyFunc;
         typedef std::function<void(unsigned int)>       onCharFunc;
@@ -41,6 +47,7 @@ namespace Piccolo
         typedef std::function<void(int, int)>           onWindowSizeFunc;
         typedef std::function<void()>                   onWindowCloseFunc;
 
+        //注册回调函数
         void registerOnResetFunc(onResetFunc func) { m_onResetFunc.push_back(func); }
         void registerOnKeyFunc(onKeyFunc func) { m_onKeyFunc.push_back(func); }
         void registerOnCharFunc(onCharFunc func) { m_onCharFunc.push_back(func); }
@@ -65,7 +72,7 @@ namespace Piccolo
         void setFocusMode(bool mode);
 
     protected:
-        // window event callbacks
+        // 窗口事件回调函数的定义
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
         {
             WindowSystem* app = (WindowSystem*)glfwGetWindowUserPointer(window);
@@ -135,7 +142,7 @@ namespace Piccolo
             WindowSystem* app = (WindowSystem*)glfwGetWindowUserPointer(window);
             if (app)
             {
-                app->m_width  = width;
+                app->m_width = width;
                 app->m_height = height;
             }
         }
@@ -192,13 +199,14 @@ namespace Piccolo
                 func(width, height);
         }
 
-    private:
-        GLFWwindow* m_window {nullptr};
-        int         m_width {0};
-        int         m_height {0};
+	private:
+		GLFWwindow* m_window{nullptr};
+		int m_width{ 0 };
+		int m_height{ 0 };
 
-        bool m_is_focus_mode {false};
+        bool m_is_focus_mode{ false };
 
+        //回调函数的数组
         std::vector<onResetFunc>       m_onResetFunc;
         std::vector<onKeyFunc>         m_onKeyFunc;
         std::vector<onCharFunc>        m_onCharFunc;
@@ -210,7 +218,5 @@ namespace Piccolo
         std::vector<onDropFunc>        m_onDropFunc;
         std::vector<onWindowSizeFunc>  m_onWindowSizeFunc;
         std::vector<onWindowCloseFunc> m_onWindowCloseFunc;
-
-
-    };
-} // namespace Piccolo
+	};
+}

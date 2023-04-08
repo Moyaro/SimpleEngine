@@ -1,12 +1,9 @@
 #pragma once
-
 #include "runtime/core/math/vector3.h"
-
 #include "runtime/function/render/render_type.h"
-
 #include <vector>
 
-namespace Piccolo
+namespace SimpleEngine
 {
     struct PointLight
     {
@@ -20,10 +17,10 @@ namespace Piccolo
         float calculateRadius() const
         {
             // radius = where attenuation would lead to an intensity of 1W/m^2
-            const float INTENSITY_CUTOFF    = 1.0f;
+            const float INTENSITY_CUTOFF = 1.0f;
             const float ATTENTUATION_CUTOFF = 0.05f;
-            Vector3     intensity           = m_flux / (4.0f * Math_PI);
-            float       maxIntensity        = Vector3::getMaxElement(intensity);
+            Vector3     intensity = m_flux / (4.0f * Math_PI);
+            float       maxIntensity = Vector3::getMaxElement(intensity);
             float       attenuation = Math::max(INTENSITY_CUTOFF, ATTENTUATION_CUTOFF * maxIntensity) / maxIntensity;
             return 1.0f / sqrtf(attenuation);
         }
@@ -59,13 +56,10 @@ namespace Piccolo
     public:
         void init() {}
         void shutdown() {}
-
-        // upload changes to GPU
         void update() {}
 
         std::vector<PointLight> m_lights;
-
         std::shared_ptr<BufferData> m_buffer;
     };
 
-} // namespace Piccolo
+}

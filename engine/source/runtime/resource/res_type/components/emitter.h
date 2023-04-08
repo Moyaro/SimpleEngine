@@ -4,7 +4,7 @@
 #include "runtime/core/math/vector4.h"
 #include "runtime/core/meta/reflection/reflection.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     REFLECTION_TYPE(ParticleComponentRes)
         CLASS(ParticleComponentRes, Fields)
@@ -21,4 +21,4 @@ namespace Piccolo
         Vector2    m_life;  // life base & variance
         Vector4    m_color; // color rgba
     };
-} // namespace Piccolo
+} // namespace SimpleEngine

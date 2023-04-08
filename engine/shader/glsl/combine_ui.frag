@@ -2,7 +2,7 @@
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "constants.h"
+#include "../include/constants.h"
 
 layout(input_attachment_index = 0, set = 0, binding = 0) uniform highp subpassInput in_scene_color;
 

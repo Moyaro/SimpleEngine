@@ -6,12 +6,10 @@
 #include <string>
 #include <unordered_map>
 
-namespace Piccolo
+namespace SimpleEngine
 {
-    class Character;
     class GObject;
     class ObjectInstanceRes;
-    class PhysicsScene;
 
     using LevelObjectsMap = std::unordered_map<GObjectID, std::shared_ptr<GObject>>;
 
@@ -19,7 +17,7 @@ namespace Piccolo
     class Level
     {
     public:
-        virtual ~Level(){};
+        virtual ~Level() {};
 
         bool load(const std::string& level_res_url);
         void unload();
@@ -33,24 +31,17 @@ namespace Piccolo
         const LevelObjectsMap& getAllGObjects() const { return m_gobjects; }
 
         std::weak_ptr<GObject>   getGObjectByID(GObjectID go_id) const;
-        std::weak_ptr<Character> getCurrentActiveCharacter() const { return m_current_active_character; }
 
         GObjectID createObject(const ObjectInstanceRes& object_instance_res);
         void      deleteGObjectByID(GObjectID go_id);
 
-        std::weak_ptr<PhysicsScene> getPhysicsScene() const { return m_physics_scene; }
-
     protected:
         void clear();
 
-        bool        m_is_loaded {false};
+        bool        m_is_loaded{ false };
         std::string m_level_res_url;
 
         // all game objects in this level, key: object id, value: object instance
         LevelObjectsMap m_gobjects;
-
-        std::shared_ptr<Character> m_current_active_character;
-
-        std::weak_ptr<PhysicsScene> m_physics_scene;
     };
-} // namespace Piccolo
+}

@@ -2,7 +2,7 @@
 
 #extension GL_GOOGLE_include_directive :enable
 
-#include "constants.h"
+#include "../include/constants.h"
 
 struct PointLight
 {

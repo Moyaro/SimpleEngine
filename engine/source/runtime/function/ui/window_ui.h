@@ -2,21 +2,24 @@
 
 #include <memory>
 
-namespace Piccolo
-{
-    class WindowSystem;
-    class RenderSystem;
+namespace SimpleEngine {
 
-    struct WindowUIInitInfo
-    {
-        std::shared_ptr<WindowSystem> window_system;
-        std::shared_ptr<RenderSystem> render_system;
-    };
+	class WindowSystem;
+	class RenderSystem;
 
-    class WindowUI
-    {
-    public:
-        virtual void initialize(WindowUIInitInfo init_info) = 0;
-        virtual void preRender() = 0;
-    };
-} // namespace Piccolo
+	/// <summary>
+	/// 窗口界面初始化信息
+	/// </summary>
+	struct WindowUIInitInfo {
+		std::shared_ptr<WindowSystem> window_system;
+		std::shared_ptr<RenderSystem> render_system;
+	};
+
+	//用窗口和渲染系统初始化
+	class WindowUI
+	{
+	public:
+		virtual void init(WindowUIInitInfo init_info) = 0;
+		virtual void preRender() = 0;
+	};
+}

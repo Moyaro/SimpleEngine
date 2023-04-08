@@ -1,14 +1,13 @@
 #pragma once
-
 #include "runtime/core/math/vector2.h"
 
 #include "runtime/function/render/render_camera.h"
 
 #include <vector>
 
-namespace Piccolo
+namespace SimpleEngine
 {
-    class PiccoloEditor;
+    class EngineEditor;
 
     enum class EditorCommand : unsigned int
     {
@@ -28,8 +27,8 @@ namespace Piccolo
     class EditorInputManager
     {
     public:
-        void initialize();
-        void tick(float delta_time);
+        void init() { registerInput(); }
+        void tick(float delta_time) { processEditorCommand(); }
 
     public:
         void registerInput();
@@ -45,7 +44,7 @@ namespace Piccolo
         void onMouseButtonClicked(int key, int action);
         void onWindowClosed();
 
-        bool isCursorInRect(Vector2 pos, Vector2 size) const;
+        bool isCursorInRect(Vector2 pos, Vector2 size) const{ return pos.x <= m_mouse_x && m_mouse_x <= pos.x + size.x && pos.y <= m_mouse_y && m_mouse_y <= pos.y + size.y; }
 
     public:
         Vector2 getEngineWindowPos() const { return m_engine_window_pos; };
@@ -57,13 +56,17 @@ namespace Piccolo
         void resetEditorCommand() { m_editor_command = 0; }
 
     private:
+        //窗口位置、宽高
         Vector2 m_engine_window_pos {0.0f, 0.0f};
         Vector2 m_engine_window_size {1280.0f, 768.0f};
+
+        //鼠标位置
         float   m_mouse_x {0.0f};
         float   m_mouse_y {0.0f};
-        float   m_camera_speed {0.05f};
+
+        float   m_camera_speed {0.05f};//相机移动速度
 
         size_t       m_cursor_on_axis {3};
         unsigned int m_editor_command {0};
     };
-} // namespace Piccolo
+}

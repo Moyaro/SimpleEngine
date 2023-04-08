@@ -1,36 +1,22 @@
 #include <filesystem>
 #include <iostream>
-#include <string>
-#include <thread>
-#include <unordered_map>
 
-#include "runtime/engine.h"
+#include "../../runtime/engine.h"
+#include "../include/editor.h"
+int main(int argc, char** argv) {
+	std::filesystem::path executable_path(argv[0]);//可执行文件的路径
+	std::filesystem::path config_file_path = executable_path.parent_path() / "EngineEditor.ini";//编辑器配置文件
 
-#include "editor/include/editor.h"
+	//启动引擎
+	SimpleEngine::Engine* engine = new SimpleEngine::Engine();
+	engine->startEngine(config_file_path.generic_string());
 
-// https://gcc.gnu.org/onlinedocs/cpp/Stringizing.html
-#define PICCOLO_XSTR(s) PICCOLO_STR(s)
-#define PICCOLO_STR(s) #s
+	//启动编辑器
+	SimpleEngine::Editor* editor = new SimpleEngine::Editor();
+	editor->init(engine);
+	editor->run();
 
-int main(int argc, char** argv)
-{
-    std::filesystem::path executable_path(argv[0]);
-    std::filesystem::path config_file_path = executable_path.parent_path() / "PiccoloEditor.ini";
-
-    Piccolo::PiccoloEngine* engine = new Piccolo::PiccoloEngine();
-
-    engine->startEngine(config_file_path.generic_string());
-    engine->initialize();
-
-    Piccolo::PiccoloEditor* editor = new Piccolo::PiccoloEditor();
-    editor->initialize(engine);
-
-    editor->run();
-
-    editor->clear();
-
-    engine->clear();
-    engine->shutdownEngine();
-
-    return 0;
+	editor->clear();
+	engine->closeEngine();
+	return 0;
 }

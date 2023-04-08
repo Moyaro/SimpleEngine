@@ -4,8 +4,9 @@
 #include <cfloat>
 #include <random>
 
-namespace Piccolo
+namespace SimpleEngine
 {
+    //根据NumericType决定生成整形/浮点型随机数
     template<typename NumericType>
     using uniform_distribution = typename std::conditional<std::is_integral<NumericType>::value,
                                                            std::uniform_int_distribution<NumericType>,
@@ -20,8 +21,7 @@ namespace Piccolo
 
     public:
         template<typename... Params>
-        explicit RandomNumberGenerator(Params&&... params) : m_engine(std::forward<Params>(params)...)
-        {}
+        explicit RandomNumberGenerator(Params&&... params) : m_engine(std::forward<Params>(params)...){}
 
         template<typename... Params>
         void seed(Params&&... seeding)
@@ -97,4 +97,4 @@ namespace Piccolo
     };
 
     using DefaultRNG = RandomNumberGenerator<std::mt19937>;
-} // namespace Chaos
+}

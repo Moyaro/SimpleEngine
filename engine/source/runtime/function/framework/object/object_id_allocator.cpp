@@ -1,21 +1,20 @@
 #include "runtime/function/framework/object/object_id_allocator.h"
+#include <stdexcept>
 
-#include "core/base/macro.h"
-
-namespace Piccolo
+namespace SimpleEngine
 {
-    std::atomic<GObjectID> ObjectIDAllocator::m_next_id {0};
+    std::atomic<GObjectID> ObjectIDAllocator::m_next_id{ 0 };
 
     GObjectID ObjectIDAllocator::alloc()
     {
-        std::atomic<GObjectID> new_object_ret = m_next_id.load();
+        std::atomic<GObjectID> new_object_id = m_next_id.load();
         m_next_id++;
-        if (m_next_id >= k_invalid_gobject_id)
+        if (m_next_id > k_invalid_gobject_id)
         {
-            LOG_FATAL("gobject id overflow");
+            std::runtime_error("id分配超过上限！");
         }
 
-        return new_object_ret;
+        return new_object_id;
     }
 
-} // namespace Piccolo
+}

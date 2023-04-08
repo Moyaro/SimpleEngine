@@ -15,7 +15,7 @@
 
 #include "_generated/serializer/all_serializer.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     bool shouldComponentTick(std::string component_type_name)
     {
@@ -33,7 +33,7 @@ namespace Piccolo
     {
         for (auto& component : m_components)
         {
-            PICCOLO_REFLECTION_DELETE(component);
+            ENGINE_REFLECTION_DELETE(component);
         }
         m_components.clear();
     }
@@ -103,10 +103,10 @@ namespace Piccolo
 
     void GObject::save(ObjectInstanceRes& out_object_instance_res)
     {
-        out_object_instance_res.m_name       = m_name;
+        out_object_instance_res.m_name = m_name;
         out_object_instance_res.m_definition = m_definition_url;
 
         out_object_instance_res.m_instanced_components = m_components;
     }
 
-} // namespace Piccolo
+}

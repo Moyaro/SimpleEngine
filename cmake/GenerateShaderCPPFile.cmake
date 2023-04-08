@@ -9,7 +9,8 @@
 ####################################################################################################
 
 function(embed_resource resource_file_name source_file_name variable_name)
-
+    message("进入函数")
+    #如果已存在source，且source比resource更新，就无需操作
     if(EXISTS "${source_file_name}")
         if("${source_file_name}" IS_NEWER_THAN "${resource_file_name}")
             return()
@@ -19,13 +20,13 @@ function(embed_resource resource_file_name source_file_name variable_name)
     if(EXISTS "${resource_file_name}")
         file(READ "${resource_file_name}" hex_content HEX)
 
+        #读入32个十六进制数，转换为16个0xXXX
         string(REPEAT "[0-9a-f]" 32 pattern)
         string(REGEX REPLACE "(${pattern})" "\\1\n" content "${hex_content}")
-
         string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1, " content "${content}")
-
         string(REGEX REPLACE ", $" "" content "${content}")
 
+        #向量定义
         set(array_definition "static const std::vector<unsigned char> ${variable_name} =\n{\n${content}\n};")
         
         get_filename_component(file_name ${source_file_name} NAME)

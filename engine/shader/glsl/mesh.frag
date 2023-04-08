@@ -2,7 +2,7 @@
 
 #extension GL_GOOGLE_include_directive : enable
 
-#include "constants.h"
+#include "../include/constants.h"
 
 struct DirectionalLight
 {
@@ -86,11 +86,11 @@ highp vec3 calculateNormal()
     return normalize(TBN * tangent_normal);
 }
 
-#include "mesh_lighting.h"
+#include "../include/mesh_lighting.h"
 
 void main()
 {
-    highp vec3  N                   = calculateNormal();
+    highp vec3  N = calculateNormal();
     highp vec3  basecolor           = getBasecolor();
     highp float metallic            = texture(metallic_roughness_texture_sampler, in_texcoord).z * metallicFactor;
     highp float dielectric_specular = 0.04;
@@ -98,7 +98,7 @@ void main()
 
     highp vec3 result_color;
 
-#include "mesh_lighting.inl"
+#include "../include/mesh_lighting.inl"
 
     out_scene_color = vec4(result_color, 1.0);
 }

@@ -8,19 +8,23 @@
 
 #define CMP(x, y) (fabsf(x - y) < FLT_EPSILON * fmaxf(1.0f, fmaxf(fabsf(x), fabsf(y))))
 
-namespace Piccolo
+namespace SimpleEngine
 {
-    static const float Math_POS_INFINITY = std::numeric_limits<float>::infinity();
-    static const float Math_NEG_INFINITY = -std::numeric_limits<float>::infinity();
+    static const float Math_POS_INFINITY = std::numeric_limits<float>::infinity();//正无穷
+    static const float Math_NEG_INFINITY = -std::numeric_limits<float>::infinity();//负无穷
     static const float Math_PI           = 3.14159265358979323846264338327950288f;
     static const float Math_ONE_OVER_PI  = 1.0f / Math_PI;
     static const float Math_TWO_PI       = 2.0f * Math_PI;
     static const float Math_HALF_PI      = 0.5f * Math_PI;
+
+    //角度、弧度转换系数
     static const float Math_fDeg2Rad     = Math_PI / 180.0f;
     static const float Math_fRad2Deg     = 180.0f / Math_PI;
-    static const float Math_LOG2         = log(2.0f);
-    static const float Math_EPSILON      = 1e-6f;
 
+    static const float Math_LOG2         = log(2.0f);//2为底的对数
+
+    //判断浮点数是否接近于0
+    static const float Math_EPSILON      = 1e-6f;
     static const float Float_EPSILON  = FLT_EPSILON;
     static const float Double_EPSILON = DBL_EPSILON;
 
@@ -35,9 +39,10 @@ namespace Piccolo
     class Matrix4x4;
     class Quaternion;
 
+    //弧度类
     class Radian
     {
-        float m_rad;
+        float m_rad;//弧度
 
     public:
         explicit Radian(float r = 0) : m_rad(r) {}
@@ -49,12 +54,15 @@ namespace Piccolo
         }
         Radian& operator=(const Degree& d);
 
+        //转换弧度、角度
         float valueRadians() const { return m_rad; }
-        float valueDegrees() const; // see bottom of this file
+        float valueDegrees() const; 
         float valueAngleUnits() const;
 
         void setValue(float f) { m_rad = f; }
 
+
+        //一些数学运算
         const Radian& operator+() const { return *this; }
         Radian        operator+(const Radian& r) const { return Radian(m_rad + r.m_rad); }
         Radian        operator+(const Degree& d) const;
@@ -95,14 +103,11 @@ namespace Piccolo
         bool operator>(const Radian& r) const { return m_rad > r.m_rad; }
     };
 
-    /** Wrapper class which indicates a given angle value is in Degrees.
-    @remarks
-        Degree values are interchangeable with Radian values, and conversions
-        will be done automatically between them.
-    */
+   
+    //角度类
     class Degree
     {
-        float m_deg; // if you get an error here - make sure to define/typedef 'float' first
+        float m_deg; 
 
     public:
         explicit Degree(float d = 0) : m_deg(d) {}
@@ -120,7 +125,7 @@ namespace Piccolo
         }
 
         float valueDegrees() const { return m_deg; }
-        float valueRadians() const; // see bottom of this file
+        float valueRadians() const;
         float valueAngleUnits() const;
 
         const Degree& operator+() const { return *this; }
@@ -171,12 +176,7 @@ namespace Piccolo
         bool operator>(const Degree& d) const { return m_deg > d.m_deg; }
     };
 
-    /** Wrapper class which identifies a value as the currently default angle
-        type, as defined by Math::setAngleUnit.
-    @remarks
-        Angle values will be automatically converted between radians and degrees,
-        as appropriate.
-    */
+    //用于在不同的角度单位之间进行转换
     class Angle
     {
         float m_angle;
@@ -192,27 +192,29 @@ namespace Piccolo
     class Math
     {
     private:
+        
         enum class AngleUnit
         {
             AU_DEGREE,
             AU_RADIAN
         };
 
-        // angle units used by the api
         static AngleUnit k_AngleUnit;
 
     public:
         Math();
-
+        //取绝对值、判断是否为 NaN、平方、开方、倒数
         static float abs(float value) { return std::fabs(value); }
         static bool  isNan(float f) { return std::isnan(f); }
         static float sqr(float value) { return value * value; }
         static float sqrt(float fValue) { return std::sqrt(fValue); }
         static float invSqrt(float value) { return 1.f / sqrt(value); }
         static bool  realEqual(float a, float b, float tolerance = std::numeric_limits<float>::epsilon());
+        //数值进行上下限的限制、获取三个数中的最大值
         static float clamp(float v, float min, float max) { return std::clamp(v, min, max); }
         static float getMaxElement(float x, float y, float z) { return std::max({x, y, z}); }
 
+        //角度、弧度之间的转换
         static float degreesToRadians(float degrees);
         static float radiansToDegrees(float radians);
         static float angleUnitsToRadians(float units);
@@ -220,6 +222,7 @@ namespace Piccolo
         static float angleUnitsToDegrees(float units);
         static float degreesToAngleUnits(float degrees);
 
+        //三角函数、反三角函数
         static float  sin(const Radian& rad) { return std::sin(rad.valueRadians()); }
         static float  sin(float value) { return std::sin(value); }
         static float  cos(const Radian& rad) { return std::cos(rad.valueRadians()); }
@@ -255,6 +258,7 @@ namespace Piccolo
             return std::min({A, B, C});
         }
 
+        //视图矩阵、观察矩阵、透视投影矩阵、正交投影矩阵
         static Matrix4x4
         makeViewMatrix(const Vector3& position, const Quaternion& orientation, const Matrix4x4* reflect_matrix = nullptr);
 
@@ -270,8 +274,6 @@ namespace Piccolo
         makeOrthographicProjectionMatrix01(float left, float right, float bottom, float top, float znear, float zfar);
     };
 
-    // these functions could not be defined within the class definition of class
-    // Radian because they required class Degree to be defined
     inline Radian::Radian(const Degree& d) : m_rad(d.valueRadians()) {}
     inline Radian& Radian::operator=(const Degree& d)
     {
@@ -310,4 +312,4 @@ namespace Piccolo
     inline Degree operator*(float a, const Degree& b) { return Degree(a * b.valueDegrees()); }
 
     inline Degree operator/(float a, const Degree& b) { return Degree(a / b.valueDegrees()); }
-} // namespace Piccolo
+}

@@ -5,7 +5,7 @@
 // TODO: geometry shader is inefficient for Mali GPU
 #extension GL_EXT_geometry_shader : enable
 
-#include "constants.h"
+#include "../include/constants.h"
 
 layout(set = 0, binding = 0) readonly buffer _unused_name_global_set_per_frame_binding_buffer
 {

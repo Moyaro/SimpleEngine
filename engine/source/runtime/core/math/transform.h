@@ -1,10 +1,10 @@
 #pragma once
-#include "runtime/core/math/matrix4.h"
-#include "runtime/core/math/quaternion.h"
-#include "runtime/core/math/vector3.h"
+#include "matrix4.h"
+#include "quaternion.h"
+#include "vector3.h"
 #include "runtime/core/meta/reflection/reflection.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     REFLECTION_TYPE(Transform)
     CLASS(Transform, Fields)
@@ -17,9 +17,7 @@ namespace Piccolo
         Quaternion m_rotation {Quaternion::IDENTITY};
 
         Transform() = default;
-        Transform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) :
-            m_position {position}, m_scale {scale}, m_rotation {rotation}
-        {}
+        Transform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) : m_position {position}, m_scale {scale}, m_rotation {rotation}{}
 
         Matrix4x4 getMatrix() const
         {
@@ -28,4 +26,4 @@ namespace Piccolo
             return temp;
         }
     };
-} // namespace Piccolo
+} // namespace SimpleEngine

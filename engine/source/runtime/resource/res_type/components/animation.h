@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace Piccolo
+namespace SimpleEngine
 {
 
     REFLECTION_TYPE(AnimationResultElement)
@@ -43,4 +43,4 @@ namespace Piccolo
         AnimationResult animation_result;
     };
 
-} // namespace Piccolo
+} // namespace SimpleEngine

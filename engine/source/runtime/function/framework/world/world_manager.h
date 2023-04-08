@@ -5,11 +5,10 @@
 #include <filesystem>
 #include <string>
 
-namespace Piccolo
+namespace SimpleEngine
 {
     class Level;
     class LevelDebugger;
-    class PhysicsScene;
 
     /// Manage all game worlds, it should be support multiple worlds, including game world and editor world.
     /// Currently, the implement just supports one active world and one active level
@@ -18,7 +17,7 @@ namespace Piccolo
     public:
         virtual ~WorldManager();
 
-        void initialize();
+        void init();
         void clear();
 
         void reloadCurrentLevel();
@@ -27,22 +26,21 @@ namespace Piccolo
         void                 tick(float delta_time);
         std::weak_ptr<Level> getCurrentActiveLevel() const { return m_current_active_level; }
 
-        std::weak_ptr<PhysicsScene> getCurrentActivePhysicsScene() const;
-
     private:
         bool loadWorld(const std::string& world_url);
         bool loadLevel(const std::string& level_url);
 
-        bool                      m_is_world_loaded {false};
+        bool                      m_is_world_loaded{ false };
         std::string               m_current_world_url;
         std::shared_ptr<WorldRes> m_current_world_resource;
 
-        // all loaded levels, key: level url, vaule: level instance
+        //key: level url, vaule: level instance
         std::unordered_map<std::string, std::shared_ptr<Level>> m_loaded_levels;
-        // active level, currently we just support one active level
+
+        //激活的关卡，目前只支持一个
         std::weak_ptr<Level> m_current_active_level;
 
         //debug level
         std::shared_ptr<LevelDebugger> m_level_debugger;
     };
-} // namespace Piccolo
+}

@@ -3,19 +3,19 @@
 #include "runtime/core/math/vector2.h"
 #include "runtime/function/render/render_pass.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     class RenderResourceBase;
 
     struct PickPassInitInfo : RenderPassInitInfo
     {
-        RHIDescriptorSetLayout* per_mesh_layout;
+        VkDescriptorSetLayout per_mesh_layout;
     };
 
     class PickPass : public RenderPass
     {
     public:
-        void initialize(const RenderPassInitInfo* init_info) override final;
+        void init(const RenderPassInitInfo* init_info) override final;
         void postInitialize() override final;
         void preparePassData(std::shared_ptr<RenderResourceBase> render_resource) override final;
         void draw() override final;
@@ -34,10 +34,10 @@ namespace Piccolo
         void setupDescriptorSet();
 
     private:
-        RHIImage*        _object_id_image = nullptr;
-        RHIDeviceMemory* _object_id_image_memory = nullptr;
-        RHIImageView*      _object_id_image_view = nullptr;
+        VkImage        _object_id_image;
+        VkDeviceMemory _object_id_image_memory;
+        VkImageView      _object_id_image_view;
 
-        RHIDescriptorSetLayout* _per_mesh_layout = nullptr;
+        VkDescriptorSetLayout _per_mesh_layout;
     };
 } // namespace Piccolo

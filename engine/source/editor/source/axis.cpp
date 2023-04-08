@@ -1,7 +1,6 @@
-#include "editor/include/axis.h"
+#include "../include/axis.h"
 
-namespace Piccolo
-{
+namespace SimpleEngine {
     EditorTranslationAxis::EditorTranslationAxis()
     {
         // create translation axis render mesh
@@ -116,7 +115,7 @@ namespace Piccolo
             vertex_z.v = 0.0f;
         }
 
-        size_t index_data_size                        = (4 * segments * 3) * 3 * sizeof(uint16_t);
+        size_t index_data_size = (4 * segments * 3) * 3 * sizeof(uint16_t);
         m_mesh_data.m_static_mesh_data.m_index_buffer = std::make_shared<BufferData>(index_data_size);
         uint16_t* index_data = static_cast<uint16_t*>(m_mesh_data.m_static_mesh_data.m_index_buffer->m_data);
 
@@ -651,5 +650,4 @@ namespace Piccolo
         index_data[start_index + 11 * 3 + 1] = (uint16_t)(start_vertex_index + 6);
         index_data[start_index + 11 * 3 + 2] = (uint16_t)(start_vertex_index + 2);
     }
-
-} // namespace Piccolo
+}

@@ -1,9 +1,9 @@
 #include "runtime/core/math/quaternion.h"
 #include "runtime/core/math/matrix3.h"
-#include "runtime/core/math/matrix4.h"
-#include "runtime/core/math/vector3.h"
+#include "matrix4.h"
+#include "vector3.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     const Quaternion Quaternion::ZERO(0, 0, 0, 0);
     const Quaternion Quaternion::IDENTITY(1, 0, 0, 0);
@@ -403,4 +403,4 @@ namespace Piccolo
         result.normalise();
         return result;
     }
-} // namespace Piccolo
+} // namespace SimpleEngine

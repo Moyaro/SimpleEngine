@@ -1,343 +1,9 @@
 #include "debug_draw_group.h"
-#include <vector>
-#include "runtime/function/global/global_context.h"
-#include "runtime/function/render/render_system.h"
+#include "debug_draw_primitive.h"
 
-namespace Piccolo
-{
-    DebugDrawGroup::~DebugDrawGroup() { clear(); }
-    void DebugDrawGroup::initialize()
-    {
-    }
+namespace SimpleEngine {
 
-    void DebugDrawGroup::clear()
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        clearData();
-    }
-
-    void DebugDrawGroup::clearData()
-    {
-        m_points.clear();
-        m_lines.clear();
-        m_triangles.clear();
-        m_quads.clear();
-        m_boxes.clear();
-        m_cylinders.clear();
-        m_spheres.clear();
-        m_capsules.clear();
-        m_texts.clear();
-    }
-
-    void DebugDrawGroup::setName(const std::string& name) { m_name = name; }
-
-    const std::string& DebugDrawGroup::getName() const{return m_name;}
-
-    void DebugDrawGroup::addPoint(const Vector3& position, const Vector4& color, const float life_time, const bool no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawPoint point;
-        point.m_vertex.color = color;
-        point.setTime(life_time);
-        point.m_fill_mode = _FillMode_wireframe;
-        point.m_vertex.pos = position;
-        point.m_no_depth_test = no_depth_test;
-        m_points.push_back(point);
-    }
-
-    void DebugDrawGroup::addLine(const Vector3& point0, 
-                                 const Vector3& point1,
-                                 const Vector4& color0, 
-                                 const Vector4& color1, 
-                                 const float    life_time,
-                                 const bool     no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawLine line;
-        line.setTime(life_time);
-        line.m_fill_mode = _FillMode_wireframe;
-        line.m_no_depth_test = no_depth_test;
-
-        line.m_vertex[0].pos     = point0;
-        line.m_vertex[0].color = color0;
-
-        line.m_vertex[1].pos     = point1;
-        line.m_vertex[1].color = color1;
-
-        m_lines.push_back(line);
-    }
-
-    void DebugDrawGroup::addTriangle(const Vector3& point0,
-                                     const Vector3& point1,
-                                     const Vector3& point2,
-                                     const Vector4& color0,
-                                     const Vector4& color1,
-                                     const Vector4& color2,
-                                     const float    life_time,
-                                     const bool     no_depth_test,
-                                     const FillMode fillmod)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawTriangle triangle;
-        triangle.setTime(life_time);
-        triangle.m_fill_mode = fillmod;
-        triangle.m_no_depth_test = no_depth_test;
-
-        triangle.m_vertex[0].pos   = point0;
-        triangle.m_vertex[0].color = color0;
-
-        triangle.m_vertex[1].pos   = point1;
-        triangle.m_vertex[1].color = color1;
-
-        triangle.m_vertex[2].pos   = point2;
-        triangle.m_vertex[2].color = color2;
-        
-        m_triangles.push_back(triangle);
-        
-
-    }
-
-    void DebugDrawGroup::addQuad(const Vector3& point0,
-                                 const Vector3& point1,
-                                 const Vector3& point2,
-                                 const Vector3& point3,
-                                 const Vector4& color0,
-                                 const Vector4& color1,
-                                 const Vector4& color2,
-                                 const Vector4& color3,
-                                 const float    life_time,
-                                 const bool     no_depth_test,
-                                 const FillMode fillmode)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        if (fillmode == _FillMode_wireframe)
-        {
-            DebugDrawQuad quad;
-
-            quad.m_vertex[0].pos   = point0;
-            quad.m_vertex[0].color = color0;
-
-            quad.m_vertex[1].pos   = point1;
-            quad.m_vertex[1].color = color1;
-            
-            quad.m_vertex[2].pos   = point2;
-            quad.m_vertex[2].color = color2;
-            
-            quad.m_vertex[3].pos   = point3;
-            quad.m_vertex[3].color = color3;
-
-            quad.setTime(life_time);
-            quad.m_no_depth_test = no_depth_test;
-
-            m_quads.push_back(quad);
-        }
-        else
-        {
-            DebugDrawTriangle triangle;
-            triangle.setTime(life_time);
-            triangle.m_fill_mode         = _FillMode_solid;
-            triangle.m_no_depth_test   = no_depth_test;
-
-            triangle.m_vertex[0].pos     = point0;
-            triangle.m_vertex[0].color   = color0;
-            triangle.m_vertex[1].pos     = point1;
-            triangle.m_vertex[1].color   = color1;
-            triangle.m_vertex[2].pos     = point2;
-            triangle.m_vertex[2].color   = color2;
-            m_triangles.push_back(triangle);
-
-            triangle.m_vertex[0].pos     = point0;
-            triangle.m_vertex[0].color = color0;
-            triangle.m_vertex[1].pos     = point2;
-            triangle.m_vertex[1].color = color2;
-            triangle.m_vertex[2].pos     = point3;
-            triangle.m_vertex[2].color = color3;
-            m_triangles.push_back(triangle);
-        }
-    }
-
-    void DebugDrawGroup::addBox(const Vector3& center_point,
-                                const Vector3& half_extends,
-                                const Vector4& rotate,
-                                const Vector4& color,
-                                const float    life_time,
-                                const bool     no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawBox box;
-        box.m_center_point = center_point;
-        box.m_half_extents = half_extends;
-        box.m_rotate = rotate;
-        box.m_color = color;
-        box.m_no_depth_test = no_depth_test;
-        box.setTime(life_time);
-
-        m_boxes.push_back(box);
-    }
-
-    void DebugDrawGroup::addSphere(const Vector3& center,
-                                   const float    radius,
-                                   const Vector4& color,
-                                   const float    life_time,
-                                   const bool     no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawSphere sphere;
-        sphere.m_center = center;
-        sphere.m_radius = radius;
-        sphere.m_color = color;
-        sphere.m_no_depth_test = no_depth_test;
-        sphere.setTime(life_time);
-
-        m_spheres.push_back(sphere);
-    }
-
-    void DebugDrawGroup::addCylinder(const Vector3& center, 
-                                     const float    radius, 
-                                     const float    height, 
-                                     const Vector4& rotate,
-                                     const Vector4& color, 
-                                     const float    life_time, 
-                                     const bool     no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawCylinder cylinder;
-        cylinder.m_radius = radius;
-        cylinder.m_center = center;
-        cylinder.m_height = height;
-        cylinder.m_rotate = rotate;
-        cylinder.m_color = color;
-        cylinder.m_no_depth_test = no_depth_test;
-        cylinder.setTime(life_time);
-
-        m_cylinders.push_back(cylinder);
-    }
-
-    void DebugDrawGroup::addCapsule(const Vector3& center,
-                                    const Vector4& rotation,
-                                    const Vector3& scale, 
-                                    const float    radius, 
-                                    const float    height, 
-                                    const Vector4& color, 
-                                    const float    life_time,
-                                    const bool     no_depth_test)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawCapsule capsule;
-        capsule.m_center = center;
-        capsule.m_rotation = rotation;
-        capsule.m_scale = scale;
-        capsule.m_radius = radius;
-        capsule.m_height = height;
-        capsule.m_color = color;
-        capsule.m_no_depth_test = no_depth_test;
-        capsule.setTime(life_time);
-
-        m_capsules.push_back(capsule);
-    }
-
-    void DebugDrawGroup::addText(const std::string& content,
-                                 const Vector4&     color,
-                                 const Vector3&     coordinate,
-                                 const int          size,
-                                 const bool         is_screen_text,
-                                 const float        life_time)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        DebugDrawText text;
-        text.m_content = content;
-        text.m_color = color;
-        text.m_coordinate = coordinate;
-        text.m_size = size;
-        text.m_is_screen_text = is_screen_text;
-        text.setTime(life_time);
-        m_texts.push_back(text);
-    }
-
-    void DebugDrawGroup::removeDeadPrimitives(float delta_time)
-    {
-        for (std::list<DebugDrawPoint>::iterator point = m_points.begin(); point != m_points.end();)
-        {
-            if (point->isTimeOut(delta_time)) {
-                point = m_points.erase(point);
-            }
-            else {
-                point++;
-            }
-        }
-        for (std::list<DebugDrawLine>::iterator line = m_lines.begin(); line != m_lines.end();)
-        {
-            if (line->isTimeOut(delta_time)) {
-                line = m_lines.erase(line);
-            }
-            else {
-                line++;
-            }
-        }
-        for (std::list<DebugDrawTriangle>::iterator triangle = m_triangles.begin(); triangle != m_triangles.end();)
-        {
-            if (triangle->isTimeOut(delta_time)) {
-                triangle = m_triangles.erase(triangle);
-            }
-            else {
-                triangle++;
-            }
-        }
-        for (std::list<DebugDrawQuad>::iterator quad = m_quads.begin(); quad != m_quads.end();)
-        {
-            if (quad->isTimeOut(delta_time)) {
-                quad = m_quads.erase(quad);
-            }
-            else {
-                quad++;
-            }
-        }
-        for (std::list<DebugDrawBox>::iterator box = m_boxes.begin(); box != m_boxes.end();)
-        {
-            if (box->isTimeOut(delta_time)) {
-                box = m_boxes.erase(box);
-            }
-            else {
-                box++;
-            }
-        }
-        for (std::list<DebugDrawCylinder>::iterator cylinder = m_cylinders.begin(); cylinder != m_cylinders.end();)
-        {
-            if (cylinder->isTimeOut(delta_time)) {
-                cylinder = m_cylinders.erase(cylinder);
-            }
-            else {
-                cylinder++;
-            }
-        }
-        for (std::list<DebugDrawSphere>::iterator sphere = m_spheres.begin(); sphere != m_spheres.end();)
-        {
-            if (sphere->isTimeOut(delta_time)) {
-                sphere = m_spheres.erase(sphere);
-            }
-            else {
-                sphere++;
-            }
-        }
-        for (std::list<DebugDrawCapsule>::iterator capsule = m_capsules.begin(); capsule != m_capsules.end();)
-        {
-            if (capsule->isTimeOut(delta_time)) {
-                capsule = m_capsules.erase(capsule);
-            }
-            else {
-                capsule++;
-            }
-        }
-        for (std::list<DebugDrawText>::iterator text = m_texts.begin(); text != m_texts.end();)
-        {
-            if (text->isTimeOut(delta_time)) {
-                text = m_texts.erase(text);
-            }
-            else {
-                text++;
-            }
-        }
-    }
+    
 
     void DebugDrawGroup::mergeFrom(DebugDrawGroup* group)
     {
@@ -354,12 +20,14 @@ namespace Piccolo
         m_texts.insert(m_texts.end(), group->m_texts.begin(), group->m_texts.end());
     }
 
+    //***********************************获取物体数量*******************************************//
+
     size_t DebugDrawGroup::getPointCount(bool no_depth_test) const
     {
         size_t count = 0;
-        for (const DebugDrawPoint point : m_points)
+        for (const DebugDrawPoint& point : m_points)
         {
-            if (point.m_no_depth_test == no_depth_test)count++;
+            if (point.m_no_depth_test == no_depth_test) count++;
         }
         return count;
     }
@@ -367,27 +35,27 @@ namespace Piccolo
     size_t DebugDrawGroup::getLineCount(bool no_depth_test) const
     {
         size_t line_count = 0;
-        for (const DebugDrawLine line : m_lines)
+        for (const DebugDrawLine& line : m_lines)
         {
-            if (line.m_no_depth_test == no_depth_test)line_count++;
+            if (line.m_no_depth_test == no_depth_test)  line_count++;
         }
-        for (const DebugDrawTriangle triangle : m_triangles)
+        for (const DebugDrawTriangle& triangle : m_triangles)
         {
             if (triangle.m_fill_mode == FillMode::_FillMode_wireframe && triangle.m_no_depth_test == no_depth_test)
             {
                 line_count += 3;
             }
         }
-        for (const DebugDrawQuad quad : m_quads)
+        for (const DebugDrawQuad& quad : m_quads)
         {
             if (quad.m_fill_mode == FillMode::_FillMode_wireframe && quad.m_no_depth_test == no_depth_test)
             {
                 line_count += 4;
             }
         }
-        for (const DebugDrawBox box : m_boxes)
+        for (const DebugDrawBox& box : m_boxes)
         {
-            if (box.m_no_depth_test == no_depth_test)line_count += 12;
+            if (box.m_no_depth_test == no_depth_test)   line_count += 12;
         }
         return line_count;
     }
@@ -395,7 +63,7 @@ namespace Piccolo
     size_t DebugDrawGroup::getTriangleCount(bool no_depth_test) const
     {
         size_t triangle_count = 0;
-        for (const DebugDrawTriangle triangle : m_triangles)
+        for (const DebugDrawTriangle& triangle : m_triangles)
         {
             if (triangle.m_fill_mode == FillMode::_FillMode_solid && triangle.m_no_depth_test == no_depth_test)
             {
@@ -410,25 +78,71 @@ namespace Piccolo
         return m_spheres.size() + m_cylinders.size() + m_capsules.size();
     }
 
+    size_t DebugDrawGroup::getSphereCount(bool no_depth_test) const
+    {
+        size_t count = 0;
+        for (const DebugDrawSphere& sphere : m_spheres)
+        {
+            if (sphere.m_no_depth_test == no_depth_test)count++;
+        }
+        return count;
+    }
+    size_t DebugDrawGroup::getCylinderCount(bool no_depth_test) const
+    {
+        size_t count = 0;
+        for (const DebugDrawCylinder& cylinder : m_cylinders)
+        {
+            if (cylinder.m_no_depth_test == no_depth_test)count++;
+        }
+        return count;
+    }
+    size_t DebugDrawGroup::getCapsuleCount(bool no_depth_test) const
+    {
+        size_t count = 0;
+        for (const DebugDrawCapsule& capsule : m_capsules)
+        {
+            if (capsule.m_no_depth_test == no_depth_test)count++;
+        }
+        return count;
+    }
+    size_t DebugDrawGroup::getTextCharacterCount() const
+    {
+        size_t count = 0;
+        for (const DebugDrawText& text : m_texts)
+        {
+            for (unsigned char character : text.m_content)
+            {
+                if (character != '\n')count++;
+            }
+        }
+        return count;
+    }
+
+    //***********************************写入点/线/三角形/顶点数据*******************************************//
+
     void DebugDrawGroup::writePointData(std::vector<DebugDrawVertex>& vertexs, bool no_depth_test)
     {
+        //获取顶点数据数
         size_t vertexs_count = getPointCount(no_depth_test);
         vertexs.resize(vertexs_count);
 
+        //遍历所有顶点，把有/无深度测试的顶点数据放到vertexs里
         size_t current_index = 0;
         for (DebugDrawPoint point : m_points)
         {
-            if (point.m_no_depth_test == no_depth_test)vertexs[current_index++] = point.m_vertex;
+            if (point.m_no_depth_test == no_depth_test) vertexs[current_index++] = point.m_vertex;
         }
     }
 
-    void DebugDrawGroup::writeLineData(std::vector<DebugDrawVertex> &vertexs, bool no_depth_test)
+    void DebugDrawGroup::writeLineData(std::vector<DebugDrawVertex>& vertexs, bool no_depth_test)
     {
+        //计算出线的顶点数据数
         size_t vertexs_count = getLineCount(no_depth_test) * 2;
         vertexs.resize(vertexs_count);
 
+        //把线段顶点数据存到vertexs中
         size_t current_index = 0;
-        for (DebugDrawLine line : m_lines)
+        for (const DebugDrawLine& line : m_lines)
         {
             if (line.m_fill_mode == FillMode::_FillMode_wireframe && line.m_no_depth_test == no_depth_test)
             {
@@ -436,9 +150,9 @@ namespace Piccolo
                 vertexs[current_index++] = line.m_vertex[1];
             }
         }
-        for (DebugDrawTriangle triangle : m_triangles)
+        for (const DebugDrawTriangle& triangle : m_triangles)
         {
-            if (triangle.m_fill_mode == FillMode::_FillMode_wireframe && triangle.m_no_depth_test == no_depth_test)
+            if (triangle.m_fill_mode == FillMode::_FillMode_wireframe && triangle.m_no_depth_test == no_depth_test)//三角形由线段组成
             {
                 std::vector<size_t> indies = { 0,1, 1,2, 2,0 };
                 for (size_t i : indies)
@@ -447,7 +161,7 @@ namespace Piccolo
                 }
             }
         }
-        for (DebugDrawQuad quad : m_quads)
+        for (const DebugDrawQuad& quad : m_quads)
         {
             if (quad.m_fill_mode == FillMode::_FillMode_wireframe && quad.m_no_depth_test == no_depth_test)
             {
@@ -458,20 +172,21 @@ namespace Piccolo
                 }
             }
         }
-        for (DebugDrawBox box : m_boxes)
+        for (const DebugDrawBox& box : m_boxes)
         {
             if (box.m_no_depth_test == no_depth_test)
             {
+                //计算每个顶点的位置，然后将结果存储在verts_4d向量中
                 std::vector<DebugDrawVertex> verts_4d(8);
-                float f[2] = { -1.0f,1.0f };
+                float f[2] = { -1.0f,1.0f };//0负1正
                 for (size_t i = 0; i < 8; i++)
                 {
-                    Vector3 v(f[i & 1] * box.m_half_extents.x, f[(i >> 1) & 1] * box.m_half_extents.y, f[(i >> 2) & 1] * box.m_half_extents.z);
+                    Vector3 v(f[i & 1] * box.m_half_extents.x, f[(i >> 1) & 1] * box.m_half_extents.y, f[(i >> 2) & 1] * box.m_half_extents.z);//顶点位置
                     Vector3 uv, uuv;
-                    Vector3 qvec(box.m_rotate.x, box.m_rotate.y, box.m_rotate.z);
-                    uv = qvec.crossProduct(v);
+                    Vector3 qvec(box.m_rotate.x, box.m_rotate.y, box.m_rotate.z);//旋转位置
+                    uv = qvec.crossProduct(v);//方向
                     uuv = qvec.crossProduct(uv);
-                    uv *= (2.0f * box.m_rotate.w);
+                    uv *= (2.0f * box.m_rotate.w);//缩放向量
                     uuv *= 2.0f;
                     verts_4d[i].pos = v + uv + uuv + box.m_center_point;
                     verts_4d[i].color = box.m_color;
@@ -487,9 +202,11 @@ namespace Piccolo
 
     void DebugDrawGroup::writeTriangleData(std::vector<DebugDrawVertex>& vertexs, bool no_depth_test)
     {
+        //计算三角形顶点数据数
         size_t vertexs_count = getTriangleCount(no_depth_test) * 3;
         vertexs.resize(vertexs_count);
 
+        //将三角形顶点数据存入vertex
         size_t current_index = 0;
         for (DebugDrawTriangle triangle : m_triangles)
         {
@@ -504,17 +221,18 @@ namespace Piccolo
 
     void DebugDrawGroup::writeTextData(std::vector<DebugDrawVertex>& vertexs, DebugDrawFont* font, Matrix4x4 m_proj_view_matrix)
     {
-        RHISwapChainDesc swapChainDesc = g_runtime_global_context.m_render_system->getRHI()->getSwapchainInfo();
+        //获取屏幕宽高
+        SwapChainDesc swapChainDesc = g_runtime_global_context.m_render_system->getRHI()->getSwapchainInfo();
         uint32_t screenWidth = swapChainDesc.viewport->width;
         uint32_t screenHeight = swapChainDesc.viewport->height;
 
-        size_t vertexs_count = getTextCharacterCount() * 6;
+        size_t vertexs_count = getTextCharacterCount() * 6;//顶点数=字数*6
         vertexs.resize(vertexs_count);
 
         size_t current_index = 0;
-        for(DebugDrawText text : m_texts)
+        for (DebugDrawText text : m_texts)
         {
-            float absoluteW = text.m_size, absoluteH = text.m_size * 2;
+            float absoluteW = text.m_size, absoluteH = text.m_size * 2;//设置字的宽高
             float w = absoluteW / (1.0f * screenWidth / 2.0f), h = absoluteH / (1.0f * screenHeight / 2.0f);
             Vector3 coordinate = text.m_coordinate;
             if (!text.m_is_screen_text)
@@ -533,7 +251,6 @@ namespace Piccolo
                 }
                 else
                 {
-
                     float x1, x2, y1, y2;
                     font->getCharacterTextureRect(character, x1, y1, x2, y2);
 
@@ -573,10 +290,11 @@ namespace Piccolo
 
     void DebugDrawGroup::writeUniformDynamicDataToCache(std::vector<std::pair<Matrix4x4, Vector4> >& datas)
     {
-        // cache uniformDynamic data ,first has_depth_test ,second no_depth_test
+        //获取动态数据
         size_t data_count = getUniformDynamicDataCount() * 3;
         datas.resize(data_count);
 
+        //深度测试+无深度测试的顶点数
         bool no_depth_tests[] = { false,true };
         for (int32_t i = 0; i < 2; i++)
         {
@@ -603,7 +321,7 @@ namespace Piccolo
                 {
                     Matrix4x4 model = Matrix4x4::IDENTITY;
 
-                    //rolate
+                    //旋转
                     float w = cylinder.m_rotate.x;
                     float x = cylinder.m_rotate.y;
                     float y = cylinder.m_rotate.z;
@@ -611,10 +329,10 @@ namespace Piccolo
                     Matrix4x4 tmp = Matrix4x4::IDENTITY;
                     tmp.makeTrans(cylinder.m_center);
                     model = model * tmp;
-                    
+
                     tmp = Matrix4x4::buildScaleMatrix(cylinder.m_radius, cylinder.m_radius, cylinder.m_height / 2.0f);
                     model = model * tmp;
-            
+
                     Matrix4x4 ro = Matrix4x4::IDENTITY;
                     ro[0][0] = 1.0f - 2.0f * y * y - 2.0f * z * z; ro[0][1] = 2.0f * x * y + 2.0f * w * z;        ro[0][2] = 2.0f * x * z - 2.0f * w * y;
                     ro[1][0] = 2.0f * x * y - 2.0f * w * z;        ro[1][1] = 1.0f - 2.0f * x * x - 2.0f * z * z; ro[1][2] = 2.0f * y * z + 2.0f * w * x;
@@ -678,43 +396,277 @@ namespace Piccolo
         }
     }
 
-    size_t DebugDrawGroup::getSphereCount(bool no_depth_test) const
+    //***********************************添加物体*******************************************//
+
+    void DebugDrawGroup::addPoint(const Vector3& position, const Vector4& color, const float life_time, const bool no_depth_test)
     {
-        size_t count = 0;
-        for (const DebugDrawSphere sphere : m_spheres)
-        {
-            if (sphere.m_no_depth_test == no_depth_test)count++;
-        }
-        return count; 
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawPoint point;
+        point.setTime(life_time);
+        point.m_fill_mode = _FillMode_wireframe;
+        point.m_no_depth_test = no_depth_test;
+        
+        point.m_vertex.pos = position;
+        point.m_vertex.color = color;
+
+        m_points.push_back(point);
     }
-    size_t DebugDrawGroup::getCylinderCount(bool no_depth_test) const
+
+    void DebugDrawGroup::addLine(const Vector3& point0,const Vector3& point1,const Vector4& color0,const Vector4& color1,const float life_time,const bool no_depth_test)
     {
-        size_t count = 0;
-        for (const DebugDrawCylinder cylinder : m_cylinders)
-        {
-            if (cylinder.m_no_depth_test == no_depth_test)count++;
-        }
-        return count;
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawLine line;
+        line.setTime(life_time);
+        line.m_fill_mode = _FillMode_wireframe;
+        line.m_no_depth_test = no_depth_test;
+
+        line.m_vertex[0].pos = point0;
+        line.m_vertex[0].color = color0;
+
+        line.m_vertex[1].pos = point1;
+        line.m_vertex[1].color = color1;
+
+        m_lines.push_back(line);
     }
-    size_t DebugDrawGroup::getCapsuleCount(bool no_depth_test) const
+
+    void DebugDrawGroup::addTriangle(const Vector3& point0,const Vector3& point1,const Vector3& point2,const Vector4& color0,const Vector4& color1,const Vector4& color2,const float life_time,const bool no_depth_test,const FillMode fillmod)
     {
-        size_t count = 0;
-        for (const DebugDrawCapsule capsule : m_capsules)
-        {
-            if (capsule.m_no_depth_test == no_depth_test)count++;
-        }
-        return count;
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawTriangle triangle;
+        triangle.setTime(life_time);
+        triangle.m_fill_mode = fillmod;
+        triangle.m_no_depth_test = no_depth_test;
+
+        triangle.m_vertex[0].pos = point0;
+        triangle.m_vertex[0].color = color0;
+
+        triangle.m_vertex[1].pos = point1;
+        triangle.m_vertex[1].color = color1;
+
+        triangle.m_vertex[2].pos = point2;
+        triangle.m_vertex[2].color = color2;
+
+        m_triangles.push_back(triangle);
     }
-    size_t DebugDrawGroup::getTextCharacterCount() const
+
+    void DebugDrawGroup::addQuad(const Vector3& point0,const Vector3& point1,const Vector3& point2,const Vector3& point3,const Vector4& color0,const Vector4& color1,const Vector4& color2,const Vector4& color3,const float life_time,const bool no_depth_test,const FillMode fillmode)
     {
-        size_t count = 0;
-        for (const DebugDrawText text : m_texts)
+        std::lock_guard<std::mutex> guard(m_mutex);
+        if (fillmode == _FillMode_wireframe)
         {
-            for (unsigned char character : text.m_content)
-            {
-                if (character != '\n')count++;
+            DebugDrawQuad quad;
+            quad.setTime(life_time);
+            quad.m_no_depth_test = no_depth_test;
+            quad.m_fill_mode = _FillMode_wireframe;
+
+            quad.m_vertex[0].pos = point0;
+            quad.m_vertex[0].color = color0;
+
+            quad.m_vertex[1].pos = point1;
+            quad.m_vertex[1].color = color1;
+
+            quad.m_vertex[2].pos = point2;
+            quad.m_vertex[2].color = color2;
+
+            quad.m_vertex[3].pos = point3;
+            quad.m_vertex[3].color = color3;
+
+            m_quads.push_back(quad);
+        }
+        else//填充模式：两个三角形拼接组成四边形
+        {
+            DebugDrawTriangle triangle;
+            triangle.setTime(life_time);
+            triangle.m_fill_mode = _FillMode_solid;
+            triangle.m_no_depth_test = no_depth_test;
+
+            triangle.m_vertex[0].pos = point0;
+            triangle.m_vertex[0].color = color0;
+            triangle.m_vertex[0].texcoord = { 1.0f,0.0f };
+            triangle.m_vertex[1].pos = point1;
+            triangle.m_vertex[1].color = color1;
+            triangle.m_vertex[1].texcoord = { 0.0f,0.0f };
+            triangle.m_vertex[2].pos = point2;
+            triangle.m_vertex[2].color = color2;
+            triangle.m_vertex[2].texcoord = { 0.0f,1.0f };
+            m_triangles.push_back(triangle);
+
+            triangle.m_vertex[0].pos = point0;
+            triangle.m_vertex[0].color = color0;
+            triangle.m_vertex[0].texcoord = { 1.0f,0.0f };
+            triangle.m_vertex[1].pos = point2;
+            triangle.m_vertex[1].color = color2;
+            triangle.m_vertex[2].texcoord = { 0.0f,1.0f };
+            triangle.m_vertex[2].pos = point3;
+            triangle.m_vertex[2].color = color3;
+            m_triangles.push_back(triangle);
+        }
+    }
+
+    void DebugDrawGroup::addBox(const Vector3& center_point,const Vector3& half_extends,const Vector4& rotate,const Vector4& color,const float life_time,const bool no_depth_test)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawBox box;
+        box.setTime(life_time);
+        box.m_no_depth_test = no_depth_test;
+
+        box.m_center_point = center_point;
+        box.m_half_extents = half_extends;
+        box.m_rotate = rotate;
+        box.m_color = color;
+
+        m_boxes.push_back(box);
+    }
+
+    void DebugDrawGroup::addSphere(const Vector3& center,const float radius,const Vector4& color,const float life_time,const bool no_depth_test)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawSphere sphere;
+        sphere.m_no_depth_test = no_depth_test;
+        sphere.setTime(life_time);
+
+        sphere.m_center = center;
+        sphere.m_radius = radius;
+        sphere.m_color = color;
+        
+        m_spheres.push_back(sphere);
+    }
+
+    void DebugDrawGroup::addCylinder(const Vector3& center,const float radius,const float height,const Vector4& rotate,const Vector4& color,const float life_time,const bool no_depth_test)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawCylinder cylinder;
+        cylinder.m_no_depth_test = no_depth_test;
+        cylinder.setTime(life_time);
+
+        cylinder.m_radius = radius;
+        cylinder.m_center = center;
+        cylinder.m_height = height;
+        cylinder.m_rotate = rotate;
+        cylinder.m_color = color;
+
+        m_cylinders.push_back(cylinder);
+    }
+
+    void DebugDrawGroup::addCapsule(const Vector3& center,const Vector4& rotation,const Vector3& scale,const float radius,const float height,const Vector4& color,const float life_time,const bool no_depth_test)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawCapsule capsule;
+        capsule.m_no_depth_test = no_depth_test;
+        capsule.setTime(life_time);
+
+        capsule.m_center = center;
+        capsule.m_rotation = rotation;
+        capsule.m_scale = scale;
+        capsule.m_radius = radius;
+        capsule.m_height = height;
+        capsule.m_color = color;
+
+        m_capsules.push_back(capsule);
+    }
+
+    void DebugDrawGroup::addText(const std::string& content,const Vector4& color,const Vector3& coordinate,const int size,const bool is_screen_text,const float life_time)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        DebugDrawText text;
+        text.m_is_screen_text = is_screen_text;
+        text.setTime(life_time);
+
+        text.m_content = content;
+        text.m_color = color;
+        text.m_coordinate = coordinate;
+        text.m_size = size;
+
+        m_texts.push_back(text);
+    }
+
+    //***********************************删除组内物体*******************************************//
+
+    void DebugDrawGroup::clear()
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        m_points.clear();
+        m_lines.clear();
+        m_triangles.clear();
+        m_quads.clear();
+        m_boxes.clear();
+        m_cylinders.clear();
+        m_spheres.clear();
+        m_capsules.clear();
+        m_texts.clear();
+    }
+
+    void DebugDrawGroup::removeDeadPrimitives(float delta_time)
+    {
+        //循环检查每个列表内物体是否超时，超时就移出列表
+        for (std::list<DebugDrawPoint>::iterator point = m_points.begin(); point != m_points.end(); point++)
+        {
+            if (point->isTimeOut(delta_time)) {
+                point = m_points.erase(point);
             }
         }
-        return count;
+        for (std::list<DebugDrawLine>::iterator line = m_lines.begin(); line != m_lines.end(); line++)
+        {
+            if (line->isTimeOut(delta_time)) {
+                line = m_lines.erase(line);
+            }
+        }
+        for (std::list<DebugDrawTriangle>::iterator triangle = m_triangles.begin(); triangle != m_triangles.end(); triangle++)
+        {
+            if (triangle->isTimeOut(delta_time)) {
+                triangle = m_triangles.erase(triangle);
+            }
+        }
+        for (std::list<DebugDrawQuad>::iterator quad = m_quads.begin(); quad != m_quads.end(); quad++)
+        {
+            if (quad->isTimeOut(delta_time)) {
+                quad = m_quads.erase(quad);
+            }
+        }
+        for (std::list<DebugDrawBox>::iterator box = m_boxes.begin(); box != m_boxes.end();)
+        {
+            if (box->isTimeOut(delta_time)) {
+                box = m_boxes.erase(box);
+            }
+            else {
+                box++;
+            }
+        }
+        for (std::list<DebugDrawCylinder>::iterator cylinder = m_cylinders.begin(); cylinder != m_cylinders.end();)
+        {
+            if (cylinder->isTimeOut(delta_time)) {
+                cylinder = m_cylinders.erase(cylinder);
+            }
+            else {
+                cylinder++;
+            }
+        }
+        for (std::list<DebugDrawSphere>::iterator sphere = m_spheres.begin(); sphere != m_spheres.end();)
+        {
+            if (sphere->isTimeOut(delta_time)) {
+                sphere = m_spheres.erase(sphere);
+            }
+            else {
+                sphere++;
+            }
+        }
+        for (std::list<DebugDrawCapsule>::iterator capsule = m_capsules.begin(); capsule != m_capsules.end();)
+        {
+            if (capsule->isTimeOut(delta_time)) {
+                capsule = m_capsules.erase(capsule);
+            }
+            else {
+                capsule++;
+            }
+        }
+        for (std::list<DebugDrawText>::iterator text = m_texts.begin(); text != m_texts.end();)
+        {
+            if (text->isTimeOut(delta_time)) {
+                text = m_texts.erase(text);
+            }
+            else {
+                text++;
+            }
+        }
     }
 }

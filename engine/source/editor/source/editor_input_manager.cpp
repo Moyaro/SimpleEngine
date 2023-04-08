@@ -1,44 +1,29 @@
 #include "editor/include/editor_input_manager.h"
-
+#include "runtime/function/input/input_system.h"
 #include "editor/include/editor.h"
-#include "editor/include/editor_global_context.h"
 #include "editor/include/editor_scene_manager.h"
-
-#include "runtime/engine.h"
 #include "runtime/function/framework/level/level.h"
 #include "runtime/function/framework/world/world_manager.h"
 #include "runtime/function/global/global_context.h"
-#include "runtime/function/input/input_system.h"
-
 #include "runtime/function/render/render_camera.h"
 #include "runtime/function/render/render_system.h"
 #include "runtime/function/render/window_system.h"
+#include "runtime/engine.h"
+#include "editor/include/editor_global_context.h"
 
-namespace Piccolo
-{
-    void EditorInputManager::initialize() { registerInput(); }
-
-    void EditorInputManager::tick(float delta_time) { processEditorCommand(); }
+namespace SimpleEngine{ 
+    
+    void EditorInputManager::onWindowClosed() { g_editor_global_context.m_engine_runtime->closeEngine(); }
 
     void EditorInputManager::registerInput()
     {
         g_editor_global_context.m_window_system->registerOnResetFunc(std::bind(&EditorInputManager::onReset, this));
-        g_editor_global_context.m_window_system->registerOnCursorPosFunc(
-            std::bind(&EditorInputManager::onCursorPos, this, std::placeholders::_1, std::placeholders::_2));
-        g_editor_global_context.m_window_system->registerOnCursorEnterFunc(
-            std::bind(&EditorInputManager::onCursorEnter, this, std::placeholders::_1));
-        g_editor_global_context.m_window_system->registerOnScrollFunc(
-            std::bind(&EditorInputManager::onScroll, this, std::placeholders::_1, std::placeholders::_2));
-        g_editor_global_context.m_window_system->registerOnMouseButtonFunc(
-            std::bind(&EditorInputManager::onMouseButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
-        g_editor_global_context.m_window_system->registerOnWindowCloseFunc(
-            std::bind(&EditorInputManager::onWindowClosed, this));
-        g_editor_global_context.m_window_system->registerOnKeyFunc(std::bind(&EditorInputManager::onKey,
-                                                                             this,
-                                                                             std::placeholders::_1,
-                                                                             std::placeholders::_2,
-                                                                             std::placeholders::_3,
-                                                                             std::placeholders::_4));
+        g_editor_global_context.m_window_system->registerOnCursorPosFunc(std::bind(&EditorInputManager::onCursorPos, this, std::placeholders::_1, std::placeholders::_2));
+        g_editor_global_context.m_window_system->registerOnCursorEnterFunc(std::bind(&EditorInputManager::onCursorEnter, this, std::placeholders::_1));
+        g_editor_global_context.m_window_system->registerOnScrollFunc(std::bind(&EditorInputManager::onScroll, this, std::placeholders::_1, std::placeholders::_2));
+        g_editor_global_context.m_window_system->registerOnMouseButtonFunc(std::bind(&EditorInputManager::onMouseButtonClicked, this, std::placeholders::_1, std::placeholders::_2));
+        g_editor_global_context.m_window_system->registerOnWindowCloseFunc(std::bind(&EditorInputManager::onWindowClosed, this));
+        g_editor_global_context.m_window_system->registerOnKeyFunc(std::bind(&EditorInputManager::onKey,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4));
     }
 
     void EditorInputManager::updateCursorOnAxis(Vector2 cursor_uv)
@@ -290,11 +275,4 @@ namespace Piccolo
             }
         }
     }
-
-    void EditorInputManager::onWindowClosed() { g_editor_global_context.m_engine_runtime->shutdownEngine(); }
-
-    bool EditorInputManager::isCursorInRect(Vector2 pos, Vector2 size) const
-    {
-        return pos.x <= m_mouse_x && m_mouse_x <= pos.x + size.x && pos.y <= m_mouse_y && m_mouse_y <= pos.y + size.y;
-    }
-} // namespace Piccolo
+}

@@ -1,54 +1,39 @@
 #pragma once
 
-#include <atomic>
-#include <chrono>
-#include <filesystem>
 #include <string>
 #include <unordered_set>
+#include <chrono>
 
-namespace Piccolo
-{
-    extern bool                            g_is_editor_mode;
-    extern std::unordered_set<std::string> g_editor_tick_component_types;
+namespace SimpleEngine {
 
-    class PiccoloEngine
-    {
-        friend class PiccoloEditor;
+	extern bool g_is_editor_mode;
+	extern std::unordered_set<std::string> g_editor_tick_component_types;
 
-        static const float s_fps_alpha;
+	class Engine {
+		friend class Editor;
 
-    public:
-        void startEngine(const std::string& config_file_path);
-        void shutdownEngine();
+		static const float s_fps_alpha;//fps计算用参数
 
-        void initialize();
-        void clear();
+		public:
+			void startEngine(const std::string& config_file_path);
+			void closeEngine();
 
-        bool isQuit() const { return m_is_quit; }
-        void run();
-        bool tickOneFrame(float delta_time);
+			void run();
+			bool tickOneFrame(float delta_time);
+			int getFPS() const { return m_fps; }
 
-        int getFPS() const { return m_fps; }
+		protected:
+			float calculateDeltaTime();//每帧只被调用一次
+			void logicalTick(float delta_time);
+			void rendererTick(float delta_time);
+			void calculateFPS(float delta_time);
+			
+		protected:
+			std::chrono::steady_clock::time_point m_last_tick_time_point{std::chrono::steady_clock::now()};
 
-    protected:
-        void logicalTick(float delta_time);
-        bool rendererTick(float delta_time);
-
-        void calculateFPS(float delta_time);
-
-        /**
-         *  Each frame can only be called once
-         */
-        float calculateDeltaTime();
-
-    protected:
-        bool m_is_quit {false};
-
-        std::chrono::steady_clock::time_point m_last_tick_time_point {std::chrono::steady_clock::now()};
-
-        float m_average_duration {0.f};
-        int   m_frame_count {0};
-        int   m_fps {0};
-    };
-
-} // namespace Piccolo
+			//计算帧率用
+			float m_average_duration{ 0.f };
+			int m_frame_count{ 0 };
+			int m_fps{ 0 };
+	};
+}

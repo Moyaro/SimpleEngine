@@ -1,11 +1,14 @@
 #pragma once
 
-#include "runtime/core/math/vector3.h"
+#include "vector3.h"
 #include "runtime/core/meta/reflection/reflection.h"
 #include <limits>
 
-namespace Piccolo
+namespace SimpleEngine
 {
+    /// <summary>
+    /// 轴对齐包围盒
+    /// </summary>
     REFLECTION_TYPE(AxisAlignedBox)
     CLASS(AxisAlignedBox, Fields)
     {
@@ -14,6 +17,7 @@ namespace Piccolo
         AxisAlignedBox() {}
         AxisAlignedBox(const Vector3& center, const Vector3& half_extent);
 
+        //将立方体扩展以包含新的点
         void merge(const Vector3& new_point);
         void update(const Vector3& center, const Vector3& half_extent);
 
@@ -25,10 +29,7 @@ namespace Piccolo
     private:
         Vector3 m_center {Vector3::ZERO};
         Vector3 m_half_extent {Vector3::ZERO};
-
-        Vector3 m_min_corner {
-            std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
-        Vector3 m_max_corner {
-            -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
+        Vector3 m_min_corner {std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()};
+        Vector3 m_max_corner {-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max()};
     };
-} // namespace Piccolo
+}

@@ -1,13 +1,13 @@
-namespace Piccolo
+#pragma once
+
+namespace SimpleEngine
 {
+    /// <summary>
+    /// 调试用配置信息
+    /// </summary>
     class RenderDebugConfig
     {
     public:
-        struct Animation
-        {
-            bool show_skeleton = false;
-            bool show_bone_name = false;
-        };
         struct Camera
         {
             bool show_runtime_info = false;
@@ -17,7 +17,6 @@ namespace Piccolo
             bool show_bounding_box = false;
         };
 
-        Animation animation;
         Camera camera;
         GameObject gameObject;
     };

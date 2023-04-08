@@ -1,6 +1,6 @@
 #include "editor/include/editor_file_service.h"
 
-#include "runtime/platform/file_service/file_service.h"
+#include "runtime/platform/file_system/file_system.h"
 #include "runtime/platform/path/path.h"
 
 #include "runtime/resource/asset_manager/asset_manager.h"
@@ -8,11 +8,10 @@
 
 #include "runtime/function/global/global_context.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     /// helper function: split the input string with separator, and filter the substring
-    std::vector<std::string>
-    splitString(std::string input_string, const std::string& separator, const std::string& filter_string = "")
+    std::vector<std::string> splitString(std::string input_string, const std::string& separator, const std::string& filter_string = "")
     {
         std::vector<std::string> output_string;
         int                      pos = input_string.find(separator);
@@ -58,7 +57,7 @@ namespace Piccolo
 
         m_file_node_array.clear();
         auto root_node = std::make_shared<EditorFileNode>();
-        *root_node     = m_root_node;
+        *root_node = m_root_node;
         m_file_node_array.push_back(root_node);
 
         int all_file_segments_count = all_file_segments.size();
@@ -70,7 +69,7 @@ namespace Piccolo
             int file_segment_count = all_file_segments[file_index].size();
             for (int file_segment_index = 0; file_segment_index < file_segment_count; file_segment_index++)
             {
-                auto file_node         = std::make_shared<EditorFileNode>();
+                auto file_node = std::make_shared<EditorFileNode>();
                 file_node->m_file_name = all_file_segments[file_index][file_segment_index];
                 if (depth < file_segment_count - 1)
                 {
@@ -139,4 +138,4 @@ namespace Piccolo
         }
         return nullptr;
     }
-} // namespace Piccolo
+}

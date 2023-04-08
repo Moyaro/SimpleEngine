@@ -1,7 +1,7 @@
-#include "runtime/core/math/math.h"
-#include "runtime/core/math/matrix4.h"
+#include "math.h"
+#include "matrix4.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     Math::AngleUnit Math::k_AngleUnit;
 
@@ -79,31 +79,18 @@ namespace Piccolo
     {
         Matrix4x4 viewMatrix;
 
-        // View matrix is:
-        //
-        //  [ Lx  Uy  Dz  Tx  ]
-        //  [ Lx  Uy  Dz  Ty  ]
-        //  [ Lx  Uy  Dz  Tz  ]
-        //  [ 0   0   0   1   ]
-        //
-        // Where T = -(Transposed(Rot) * Pos)
-
-        // This is most efficiently done using 3x3 Matrices
         Matrix3x3 rot;
         orientation.toRotationMatrix(rot);
 
-        // Make the translation relative to new axes
         Matrix3x3 rotT  = rot.transpose();
         Vector3   trans = -rotT * position;
 
-        // Make final matrix
         viewMatrix = Matrix4x4::IDENTITY;
-        viewMatrix.setMatrix3x3(rotT); // fills upper 3x3
+        viewMatrix.setMatrix3x3(rotT);
         viewMatrix[0][3] = trans.x;
         viewMatrix[1][3] = trans.y;
         viewMatrix[2][3] = trans.z;
 
-        // Deal with reflections
         if (reflect_matrix)
         {
             viewMatrix = viewMatrix * (*reflect_matrix);
@@ -165,21 +152,6 @@ namespace Piccolo
         float q  = -2 * inv_distance;
         float qn = -(zfar + znear) * inv_distance;
 
-        // NB: This creates 'uniform' orthographic projection matrix,
-        // which depth range [-1,1], right-handed rules
-        //
-        // [ A   0   0   C  ]
-        // [ 0   B   0   D  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   0   1  ]
-        //
-        // A = 2 * / (right - left)
-        // B = 2 * / (top - bottom)
-        // C = - (right + left) / (right - left)
-        // D = - (top + bottom) / (top - bottom)
-        // q = - 2 / (far - near)
-        // qn = - (far + near) / (far - near)
-
         Matrix4x4 proj_matrix = Matrix4x4::ZERO;
         proj_matrix[0][0]     = A;
         proj_matrix[0][3]     = C;
@@ -206,21 +178,6 @@ namespace Piccolo
         float q  = -1 * inv_distance;
         float qn = -znear * inv_distance;
 
-        // NB: This creates 'uniform' orthographic projection matrix,
-        // which depth range [-1,1], right-handed rules
-        //
-        // [ A   0   0   C  ]
-        // [ 0   B   0   D  ]
-        // [ 0   0   q   qn ]
-        // [ 0   0   0   1  ]
-        //
-        // A = 2 * / (right - left)
-        // B = 2 * / (top - bottom)
-        // C = - (right + left) / (right - left)
-        // D = - (top + bottom) / (top - bottom)
-        // q = - 1 / (far - near)
-        // qn = - near / (far - near)
-
         Matrix4x4 proj_matrix = Matrix4x4::ZERO;
         proj_matrix[0][0]     = A;
         proj_matrix[0][3]     = C;
@@ -233,4 +190,4 @@ namespace Piccolo
         return proj_matrix;
     }
 
-} // namespace Piccolo
+}

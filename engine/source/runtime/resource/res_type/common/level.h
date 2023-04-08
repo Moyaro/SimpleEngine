@@ -5,7 +5,7 @@
 
 #include "runtime/resource/res_type/common/object.h"
 
-namespace Piccolo
+namespace SimpleEngine
 {
     REFLECTION_TYPE(LevelRes)
     CLASS(LevelRes, Fields)
@@ -18,4 +18,4 @@ namespace Piccolo
 
         std::vector<ObjectInstanceRes> m_objects;
     };
-} // namespace Piccolo
+} // namespace SimpleEngine
