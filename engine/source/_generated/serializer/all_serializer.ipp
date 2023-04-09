@@ -1,39 +1,112 @@
 #pragma once
+#include "_generated\serializer\motor.serializer.gen.h"
 #include "_generated\serializer\quaternion.serializer.gen.h"
-#include "_generated\serializer\axis_aligned.serializer.gen.h"
 #include "_generated\serializer\vector3.serializer.gen.h"
+#include "_generated\serializer\axis_aligned.serializer.gen.h"
 #include "_generated\serializer\transform.serializer.gen.h"
 #include "_generated\serializer\color.serializer.gen.h"
 #include "_generated\serializer\vector4.serializer.gen.h"
-#include "_generated\serializer\skeleton_data.serializer.gen.h"
-#include "_generated\serializer\vector2.serializer.gen.h"
-#include "_generated\serializer\skeleton_mask.serializer.gen.h"
+#include "_generated\serializer\animation_skeleton_node_map.serializer.gen.h"
 #include "_generated\serializer\matrix4.serializer.gen.h"
-#include "_generated\serializer\component.serializer.gen.h"
+#include "_generated\serializer\vector2.serializer.gen.h"
 #include "_generated\serializer\meta_example.serializer.gen.h"
 #include "_generated\serializer\camera.serializer.gen.h"
-#include "_generated\serializer\camera_component.serializer.gen.h"
+#include "_generated\serializer\component.serializer.gen.h"
 #include "_generated\serializer\material.serializer.gen.h"
-#include "_generated\serializer\mesh_component.serializer.gen.h"
+#include "_generated\serializer\camera_component.serializer.gen.h"
 #include "_generated\serializer\mesh.serializer.gen.h"
+#include "_generated\serializer\animation.serializer.gen.h"
 #include "_generated\serializer\render_object.serializer.gen.h"
+#include "_generated\serializer\mesh_component.serializer.gen.h"
 #include "_generated\serializer\object.serializer.gen.h"
-#include "_generated\serializer\level.serializer.gen.h"
 #include "_generated\serializer\transform_component.serializer.gen.h"
 #include "_generated\serializer\world.serializer.gen.h"
 #include "_generated\serializer\camera_config.serializer.gen.h"
+#include "_generated\serializer\emitter.serializer.gen.h"
 #include "_generated\serializer\global_rendering.serializer.gen.h"
-#include "_generated\serializer\animation_skeleton_node_map.serializer.gen.h"
 #include "_generated\serializer\basic_shape.serializer.gen.h"
+#include "_generated\serializer\animation_clip.serializer.gen.h"
+#include "_generated\serializer\blend_state.serializer.gen.h"
+#include "_generated\serializer\skeleton_data.serializer.gen.h"
+#include "_generated\serializer\skeleton_mask.serializer.gen.h"
+#include "_generated\serializer\level.serializer.gen.h"
 #include "_generated\serializer\rigid_body.serializer.gen.h"
 #include "_generated\serializer\mesh_data.serializer.gen.h"
-#include "_generated\serializer\animation_clip.serializer.gen.h"
 #include "_generated\serializer\global_particle.serializer.gen.h"
-#include "_generated\serializer\blend_state.serializer.gen.h"
-#include "_generated\serializer\emitter.serializer.gen.h"
-#include "_generated\serializer\animation.serializer.gen.h"
-#include "_generated\serializer\motor.serializer.gen.h"
 namespace SimpleEngine{
+    template<>
+    Json Serializer::write(const ControllerConfig& instance){
+        Json::object  ret_context;
+        
+        
+        return  Json(ret_context);
+    }
+    template<>
+    ControllerConfig& Serializer::read(const Json& json_context, ControllerConfig& instance){
+        assert(json_context.is_object());
+        
+        
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const PhysicsControllerConfig& instance){
+        Json::object  ret_context;
+        auto&&  json_context_0 = Serializer::write(*(SimpleEngine::ControllerConfig*)&instance);
+        assert(json_context_0.is_object());
+        auto&& json_context_map_0 = json_context_0.object_items();
+        ret_context.insert(json_context_map_0.begin() , json_context_map_0.end());
+        ret_context.insert_or_assign("capsule_shape", Serializer::write(instance.m_capsule_shape));
+        return  Json(ret_context);
+    }
+    template<>
+    PhysicsControllerConfig& Serializer::read(const Json& json_context, PhysicsControllerConfig& instance){
+        assert(json_context.is_object());
+        Serializer::read(json_context,*(SimpleEngine::ControllerConfig*)&instance);
+        if(!json_context["capsule_shape"].is_null()){
+            Serializer::read(json_context["capsule_shape"], instance.m_capsule_shape);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const MotorComponentRes& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("move_speed", Serializer::write(instance.m_move_speed));
+        ret_context.insert_or_assign("jump_height", Serializer::write(instance.m_jump_height));
+        ret_context.insert_or_assign("max_move_speed_ratio", Serializer::write(instance.m_max_move_speed_ratio));
+        ret_context.insert_or_assign("max_sprint_speed_ratio", Serializer::write(instance.m_max_sprint_speed_ratio));
+        ret_context.insert_or_assign("move_acceleration", Serializer::write(instance.m_move_acceleration));
+        ret_context.insert_or_assign("sprint_acceleration", Serializer::write(instance.m_sprint_acceleration));
+        ret_context.insert_or_assign("controller_config", Serializer::write(instance.m_controller_config));
+        return  Json(ret_context);
+    }
+    template<>
+    MotorComponentRes& Serializer::read(const Json& json_context, MotorComponentRes& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["move_speed"].is_null()){
+            Serializer::read(json_context["move_speed"], instance.m_move_speed);
+        }
+        if(!json_context["jump_height"].is_null()){
+            Serializer::read(json_context["jump_height"], instance.m_jump_height);
+        }
+        if(!json_context["max_move_speed_ratio"].is_null()){
+            Serializer::read(json_context["max_move_speed_ratio"], instance.m_max_move_speed_ratio);
+        }
+        if(!json_context["max_sprint_speed_ratio"].is_null()){
+            Serializer::read(json_context["max_sprint_speed_ratio"], instance.m_max_sprint_speed_ratio);
+        }
+        if(!json_context["move_acceleration"].is_null()){
+            Serializer::read(json_context["move_acceleration"], instance.m_move_acceleration);
+        }
+        if(!json_context["sprint_acceleration"].is_null()){
+            Serializer::read(json_context["sprint_acceleration"], instance.m_sprint_acceleration);
+        }
+        if(!json_context["controller_config"].is_null()){
+            Serializer::read(json_context["controller_config"], instance.m_controller_config);
+        }
+        return instance;
+    }
     template<>
     Json Serializer::write(const Quaternion& instance){
         Json::object  ret_context;
@@ -51,6 +124,30 @@ namespace SimpleEngine{
         if(!json_context["w"].is_null()){
             Serializer::read(json_context["w"], instance.w);
         }
+        if(!json_context["x"].is_null()){
+            Serializer::read(json_context["x"], instance.x);
+        }
+        if(!json_context["y"].is_null()){
+            Serializer::read(json_context["y"], instance.y);
+        }
+        if(!json_context["z"].is_null()){
+            Serializer::read(json_context["z"], instance.z);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const Vector3& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("x", Serializer::write(instance.x));
+        ret_context.insert_or_assign("y", Serializer::write(instance.y));
+        ret_context.insert_or_assign("z", Serializer::write(instance.z));
+        return  Json(ret_context);
+    }
+    template<>
+    Vector3& Serializer::read(const Json& json_context, Vector3& instance){
+        assert(json_context.is_object());
+        
         if(!json_context["x"].is_null()){
             Serializer::read(json_context["x"], instance.x);
         }
@@ -87,30 +184,6 @@ namespace SimpleEngine{
         }
         if(!json_context["max_corner"].is_null()){
             Serializer::read(json_context["max_corner"], instance.m_max_corner);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const Vector3& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("x", Serializer::write(instance.x));
-        ret_context.insert_or_assign("y", Serializer::write(instance.y));
-        ret_context.insert_or_assign("z", Serializer::write(instance.z));
-        return  Json(ret_context);
-    }
-    template<>
-    Vector3& Serializer::read(const Json& json_context, Vector3& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["x"].is_null()){
-            Serializer::read(json_context["x"], instance.x);
-        }
-        if(!json_context["y"].is_null()){
-            Serializer::read(json_context["y"], instance.y);
-        }
-        if(!json_context["z"].is_null()){
-            Serializer::read(json_context["z"], instance.z);
         }
         return instance;
     }
@@ -191,121 +264,27 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const RawBone& instance){
+    Json Serializer::write(const AnimSkelMap& instance){
         Json::object  ret_context;
         
-        ret_context.insert_or_assign("name", Serializer::write(instance.name));
-        ret_context.insert_or_assign("index", Serializer::write(instance.index));
-        ret_context.insert_or_assign("binding_pose", Serializer::write(instance.binding_pose));
-        ret_context.insert_or_assign("tpose_matrix", Serializer::write(instance.tpose_matrix));
-        ret_context.insert_or_assign("parent_index", Serializer::write(instance.parent_index));
-        return  Json(ret_context);
-    }
-    template<>
-    RawBone& Serializer::read(const Json& json_context, RawBone& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["name"].is_null()){
-            Serializer::read(json_context["name"], instance.name);
+        Json::array convert_json;
+        for (auto& item : instance.convert){
+            convert_json.emplace_back(Serializer::write(item));
         }
-        if(!json_context["index"].is_null()){
-            Serializer::read(json_context["index"], instance.index);
-        }
-        if(!json_context["binding_pose"].is_null()){
-            Serializer::read(json_context["binding_pose"], instance.binding_pose);
-        }
-        if(!json_context["tpose_matrix"].is_null()){
-            Serializer::read(json_context["tpose_matrix"], instance.tpose_matrix);
-        }
-        if(!json_context["parent_index"].is_null()){
-            Serializer::read(json_context["parent_index"], instance.parent_index);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const SkeletonData& instance){
-        Json::object  ret_context;
-        
-        Json::array bones_map_json;
-        for (auto& item : instance.bones_map){
-            bones_map_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("bones_map",bones_map_json);
-        
-        ret_context.insert_or_assign("is_flat", Serializer::write(instance.is_flat));
-        ret_context.insert_or_assign("root_index", Serializer::write(instance.root_index));
-        ret_context.insert_or_assign("in_topological_order", Serializer::write(instance.in_topological_order));
-        return  Json(ret_context);
-    }
-    template<>
-    SkeletonData& Serializer::read(const Json& json_context, SkeletonData& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["bones_map"].is_null()){
-            assert(json_context["bones_map"].is_array());
-            Json::array array_bones_map = json_context["bones_map"].array_items();
-            instance.bones_map.resize(array_bones_map.size());
-            for (size_t index=0; index < array_bones_map.size();++index){
-                Serializer::read(array_bones_map[index], instance.bones_map[index]);
-            }
-        }
-        if(!json_context["is_flat"].is_null()){
-            Serializer::read(json_context["is_flat"], instance.is_flat);
-        }
-        if(!json_context["root_index"].is_null()){
-            Serializer::read(json_context["root_index"], instance.root_index);
-        }
-        if(!json_context["in_topological_order"].is_null()){
-            Serializer::read(json_context["in_topological_order"], instance.in_topological_order);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const Vector2& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("x", Serializer::write(instance.x));
-        ret_context.insert_or_assign("y", Serializer::write(instance.y));
-        return  Json(ret_context);
-    }
-    template<>
-    Vector2& Serializer::read(const Json& json_context, Vector2& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["x"].is_null()){
-            Serializer::read(json_context["x"], instance.x);
-        }
-        if(!json_context["y"].is_null()){
-            Serializer::read(json_context["y"], instance.y);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const BoneBlendMask& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
-        Json::array enabled_json;
-        for (auto& item : instance.enabled){
-            enabled_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("enabled",enabled_json);
+        ret_context.insert_or_assign("convert",convert_json);
         
         return  Json(ret_context);
     }
     template<>
-    BoneBlendMask& Serializer::read(const Json& json_context, BoneBlendMask& instance){
+    AnimSkelMap& Serializer::read(const Json& json_context, AnimSkelMap& instance){
         assert(json_context.is_object());
         
-        if(!json_context["skeleton_file_path"].is_null()){
-            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
-        }
-        if(!json_context["enabled"].is_null()){
-            assert(json_context["enabled"].is_array());
-            Json::array array_enabled = json_context["enabled"].array_items();
-            instance.enabled.resize(array_enabled.size());
-            for (size_t index=0; index < array_enabled.size();++index){
-                Serializer::read(array_enabled[index], instance.enabled[index]);
+        if(!json_context["convert"].is_null()){
+            assert(json_context["convert"].is_array());
+            Json::array array_convert = json_context["convert"].array_items();
+            instance.convert.resize(array_convert.size());
+            for (size_t index=0; index < array_convert.size();++index){
+                Serializer::read(array_convert[index], instance.convert[index]);
             }
         }
         return instance;
@@ -387,17 +366,23 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const Component& instance){
+    Json Serializer::write(const Vector2& instance){
         Json::object  ret_context;
         
-        
+        ret_context.insert_or_assign("x", Serializer::write(instance.x));
+        ret_context.insert_or_assign("y", Serializer::write(instance.y));
         return  Json(ret_context);
     }
     template<>
-    Component& Serializer::read(const Json& json_context, Component& instance){
+    Vector2& Serializer::read(const Json& json_context, Vector2& instance){
         assert(json_context.is_object());
         
-        
+        if(!json_context["x"].is_null()){
+            Serializer::read(json_context["x"], instance.x);
+        }
+        if(!json_context["y"].is_null()){
+            Serializer::read(json_context["y"], instance.y);
+        }
         return instance;
     }
     template<>
@@ -572,22 +557,17 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const CameraComponent& instance){
+    Json Serializer::write(const Component& instance){
         Json::object  ret_context;
-        auto&&  json_context_0 = Serializer::write(*(SimpleEngine::Component*)&instance);
-        assert(json_context_0.is_object());
-        auto&& json_context_map_0 = json_context_0.object_items();
-        ret_context.insert(json_context_map_0.begin() , json_context_map_0.end());
-        ret_context.insert_or_assign("camera_res", Serializer::write(instance.m_camera_res));
+        
+        
         return  Json(ret_context);
     }
     template<>
-    CameraComponent& Serializer::read(const Json& json_context, CameraComponent& instance){
+    Component& Serializer::read(const Json& json_context, Component& instance){
         assert(json_context.is_object());
-        Serializer::read(json_context,*(SimpleEngine::Component*)&instance);
-        if(!json_context["camera_res"].is_null()){
-            Serializer::read(json_context["camera_res"], instance.m_camera_res);
-        }
+        
+        
         return instance;
     }
     template<>
@@ -623,21 +603,21 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const MeshComponent& instance){
+    Json Serializer::write(const CameraComponent& instance){
         Json::object  ret_context;
         auto&&  json_context_0 = Serializer::write(*(SimpleEngine::Component*)&instance);
         assert(json_context_0.is_object());
         auto&& json_context_map_0 = json_context_0.object_items();
         ret_context.insert(json_context_map_0.begin() , json_context_map_0.end());
-        ret_context.insert_or_assign("mesh_res", Serializer::write(instance.m_mesh_res));
+        ret_context.insert_or_assign("camera_res", Serializer::write(instance.m_camera_res));
         return  Json(ret_context);
     }
     template<>
-    MeshComponent& Serializer::read(const Json& json_context, MeshComponent& instance){
+    CameraComponent& Serializer::read(const Json& json_context, CameraComponent& instance){
         assert(json_context.is_object());
         Serializer::read(json_context,*(SimpleEngine::Component*)&instance);
-        if(!json_context["mesh_res"].is_null()){
-            Serializer::read(json_context["mesh_res"], instance.m_mesh_res);
+        if(!json_context["camera_res"].is_null()){
+            Serializer::read(json_context["camera_res"], instance.m_camera_res);
         }
         return instance;
     }
@@ -688,6 +668,70 @@ namespace SimpleEngine{
             for (size_t index=0; index < array_m_sub_meshes.size();++index){
                 Serializer::read(array_m_sub_meshes[index], instance.m_sub_meshes[index]);
             }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationResultElement& instance){
+        Json::object  ret_context;
+        
+        
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationResultElement& Serializer::read(const Json& json_context, AnimationResultElement& instance){
+        assert(json_context.is_object());
+        
+        
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationResult& instance){
+        Json::object  ret_context;
+        
+        Json::array node_json;
+        for (auto& item : instance.node){
+            node_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("node",node_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationResult& Serializer::read(const Json& json_context, AnimationResult& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["node"].is_null()){
+            assert(json_context["node"].is_array());
+            Json::array array_node = json_context["node"].array_items();
+            instance.node.resize(array_node.size());
+            for (size_t index=0; index < array_node.size();++index){
+                Serializer::read(array_node[index], instance.node[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationComponentRes& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
+        ret_context.insert_or_assign("blend_state", Serializer::write(instance.blend_state));
+        ret_context.insert_or_assign("frame_position", Serializer::write(instance.frame_position));
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationComponentRes& Serializer::read(const Json& json_context, AnimationComponentRes& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["skeleton_file_path"].is_null()){
+            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
+        }
+        if(!json_context["blend_state"].is_null()){
+            Serializer::read(json_context["blend_state"], instance.blend_state);
+        }
+        if(!json_context["frame_position"].is_null()){
+            Serializer::read(json_context["frame_position"], instance.frame_position);
         }
         return instance;
     }
@@ -786,6 +830,25 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
+    Json Serializer::write(const MeshComponent& instance){
+        Json::object  ret_context;
+        auto&&  json_context_0 = Serializer::write(*(SimpleEngine::Component*)&instance);
+        assert(json_context_0.is_object());
+        auto&& json_context_map_0 = json_context_0.object_items();
+        ret_context.insert(json_context_map_0.begin() , json_context_map_0.end());
+        ret_context.insert_or_assign("mesh_res", Serializer::write(instance.m_mesh_res));
+        return  Json(ret_context);
+    }
+    template<>
+    MeshComponent& Serializer::read(const Json& json_context, MeshComponent& instance){
+        assert(json_context.is_object());
+        Serializer::read(json_context,*(SimpleEngine::Component*)&instance);
+        if(!json_context["mesh_res"].is_null()){
+            Serializer::read(json_context["mesh_res"], instance.m_mesh_res);
+        }
+        return instance;
+    }
+    template<>
     Json Serializer::write(const ComponentDefinitionRes& instance){
         Json::object  ret_context;
         
@@ -861,40 +924,6 @@ namespace SimpleEngine{
             instance.m_instanced_components.resize(array_m_instanced_components.size());
             for (size_t index=0; index < array_m_instanced_components.size();++index){
                 Serializer::read(array_m_instanced_components[index], instance.m_instanced_components[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const LevelRes& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("gravity", Serializer::write(instance.m_gravity));
-        ret_context.insert_or_assign("character_name", Serializer::write(instance.m_character_name));
-        Json::array m_objects_json;
-        for (auto& item : instance.m_objects){
-            m_objects_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("objects",m_objects_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    LevelRes& Serializer::read(const Json& json_context, LevelRes& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["gravity"].is_null()){
-            Serializer::read(json_context["gravity"], instance.m_gravity);
-        }
-        if(!json_context["character_name"].is_null()){
-            Serializer::read(json_context["character_name"], instance.m_character_name);
-        }
-        if(!json_context["objects"].is_null()){
-            assert(json_context["objects"].is_array());
-            Json::array array_m_objects = json_context["objects"].array_items();
-            instance.m_objects.resize(array_m_objects.size());
-            for (size_t index=0; index < array_m_objects.size();++index){
-                Serializer::read(array_m_objects[index], instance.m_objects[index]);
             }
         }
         return instance;
@@ -1001,6 +1030,50 @@ namespace SimpleEngine{
         }
         if(!json_context["z_near"].is_null()){
             Serializer::read(json_context["z_near"], instance.m_z_near);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const ParticleComponentRes& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("local_translation", Serializer::write(instance.m_local_translation));
+        ret_context.insert_or_assign("local_rotation", Serializer::write(instance.m_local_rotation));
+        ret_context.insert_or_assign("velocity", Serializer::write(instance.m_velocity));
+        ret_context.insert_or_assign("acceleration", Serializer::write(instance.m_acceleration));
+        ret_context.insert_or_assign("size", Serializer::write(instance.m_size));
+        ret_context.insert_or_assign("emitter_type", Serializer::write(instance.m_emitter_type));
+        ret_context.insert_or_assign("life", Serializer::write(instance.m_life));
+        ret_context.insert_or_assign("color", Serializer::write(instance.m_color));
+        return  Json(ret_context);
+    }
+    template<>
+    ParticleComponentRes& Serializer::read(const Json& json_context, ParticleComponentRes& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["local_translation"].is_null()){
+            Serializer::read(json_context["local_translation"], instance.m_local_translation);
+        }
+        if(!json_context["local_rotation"].is_null()){
+            Serializer::read(json_context["local_rotation"], instance.m_local_rotation);
+        }
+        if(!json_context["velocity"].is_null()){
+            Serializer::read(json_context["velocity"], instance.m_velocity);
+        }
+        if(!json_context["acceleration"].is_null()){
+            Serializer::read(json_context["acceleration"], instance.m_acceleration);
+        }
+        if(!json_context["size"].is_null()){
+            Serializer::read(json_context["size"], instance.m_size);
+        }
+        if(!json_context["emitter_type"].is_null()){
+            Serializer::read(json_context["emitter_type"], instance.m_emitter_type);
+        }
+        if(!json_context["life"].is_null()){
+            Serializer::read(json_context["life"], instance.m_life);
+        }
+        if(!json_context["color"].is_null()){
+            Serializer::read(json_context["color"], instance.m_color);
         }
         return instance;
     }
@@ -1145,32 +1218,6 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const AnimSkelMap& instance){
-        Json::object  ret_context;
-        
-        Json::array convert_json;
-        for (auto& item : instance.convert){
-            convert_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("convert",convert_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimSkelMap& Serializer::read(const Json& json_context, AnimSkelMap& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["convert"].is_null()){
-            assert(json_context["convert"].is_array());
-            Json::array array_convert = json_context["convert"].array_items();
-            instance.convert.resize(array_convert.size());
-            for (size_t index=0; index < array_convert.size();++index){
-                Serializer::read(array_convert[index], instance.convert[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
     Json Serializer::write(const Geometry& instance){
         Json::object  ret_context;
         
@@ -1242,6 +1289,480 @@ namespace SimpleEngine{
         }
         if(!json_context["half_height"].is_null()){
             Serializer::read(json_context["half_height"], instance.m_half_height);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimNodeMap& instance){
+        Json::object  ret_context;
+        
+        Json::array convert_json;
+        for (auto& item : instance.convert){
+            convert_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("convert",convert_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    AnimNodeMap& Serializer::read(const Json& json_context, AnimNodeMap& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["convert"].is_null()){
+            assert(json_context["convert"].is_array());
+            Json::array array_convert = json_context["convert"].array_items();
+            instance.convert.resize(array_convert.size());
+            for (size_t index=0; index < array_convert.size();++index){
+                Serializer::read(array_convert[index], instance.convert[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationChannel& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("name", Serializer::write(instance.name));
+        Json::array position_keys_json;
+        for (auto& item : instance.position_keys){
+            position_keys_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("position_keys",position_keys_json);
+        
+        Json::array rotation_keys_json;
+        for (auto& item : instance.rotation_keys){
+            rotation_keys_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("rotation_keys",rotation_keys_json);
+        
+        Json::array scaling_keys_json;
+        for (auto& item : instance.scaling_keys){
+            scaling_keys_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("scaling_keys",scaling_keys_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationChannel& Serializer::read(const Json& json_context, AnimationChannel& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["name"].is_null()){
+            Serializer::read(json_context["name"], instance.name);
+        }
+        if(!json_context["position_keys"].is_null()){
+            assert(json_context["position_keys"].is_array());
+            Json::array array_position_keys = json_context["position_keys"].array_items();
+            instance.position_keys.resize(array_position_keys.size());
+            for (size_t index=0; index < array_position_keys.size();++index){
+                Serializer::read(array_position_keys[index], instance.position_keys[index]);
+            }
+        }
+        if(!json_context["rotation_keys"].is_null()){
+            assert(json_context["rotation_keys"].is_array());
+            Json::array array_rotation_keys = json_context["rotation_keys"].array_items();
+            instance.rotation_keys.resize(array_rotation_keys.size());
+            for (size_t index=0; index < array_rotation_keys.size();++index){
+                Serializer::read(array_rotation_keys[index], instance.rotation_keys[index]);
+            }
+        }
+        if(!json_context["scaling_keys"].is_null()){
+            assert(json_context["scaling_keys"].is_array());
+            Json::array array_scaling_keys = json_context["scaling_keys"].array_items();
+            instance.scaling_keys.resize(array_scaling_keys.size());
+            for (size_t index=0; index < array_scaling_keys.size();++index){
+                Serializer::read(array_scaling_keys[index], instance.scaling_keys[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationClip& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("total_frame", Serializer::write(instance.total_frame));
+        ret_context.insert_or_assign("node_count", Serializer::write(instance.node_count));
+        Json::array node_channels_json;
+        for (auto& item : instance.node_channels){
+            node_channels_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("node_channels",node_channels_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationClip& Serializer::read(const Json& json_context, AnimationClip& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["total_frame"].is_null()){
+            Serializer::read(json_context["total_frame"], instance.total_frame);
+        }
+        if(!json_context["node_count"].is_null()){
+            Serializer::read(json_context["node_count"], instance.node_count);
+        }
+        if(!json_context["node_channels"].is_null()){
+            assert(json_context["node_channels"].is_array());
+            Json::array array_node_channels = json_context["node_channels"].array_items();
+            instance.node_channels.resize(array_node_channels.size());
+            for (size_t index=0; index < array_node_channels.size();++index){
+                Serializer::read(array_node_channels[index], instance.node_channels[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const AnimationAsset& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("node_map", Serializer::write(instance.node_map));
+        ret_context.insert_or_assign("clip_data", Serializer::write(instance.clip_data));
+        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
+        return  Json(ret_context);
+    }
+    template<>
+    AnimationAsset& Serializer::read(const Json& json_context, AnimationAsset& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["node_map"].is_null()){
+            Serializer::read(json_context["node_map"], instance.node_map);
+        }
+        if(!json_context["clip_data"].is_null()){
+            Serializer::read(json_context["clip_data"], instance.clip_data);
+        }
+        if(!json_context["skeleton_file_path"].is_null()){
+            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const BoneBlendWeight& instance){
+        Json::object  ret_context;
+        
+        Json::array blend_weight_json;
+        for (auto& item : instance.blend_weight){
+            blend_weight_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_weight",blend_weight_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    BoneBlendWeight& Serializer::read(const Json& json_context, BoneBlendWeight& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["blend_weight"].is_null()){
+            assert(json_context["blend_weight"].is_array());
+            Json::array array_blend_weight = json_context["blend_weight"].array_items();
+            instance.blend_weight.resize(array_blend_weight.size());
+            for (size_t index=0; index < array_blend_weight.size();++index){
+                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const BlendStateWithClipData& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("clip_count", Serializer::write(instance.clip_count));
+        Json::array blend_clip_json;
+        for (auto& item : instance.blend_clip){
+            blend_clip_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_clip",blend_clip_json);
+        
+        Json::array blend_anim_skel_map_json;
+        for (auto& item : instance.blend_anim_skel_map){
+            blend_anim_skel_map_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_anim_skel_map",blend_anim_skel_map_json);
+        
+        Json::array blend_weight_json;
+        for (auto& item : instance.blend_weight){
+            blend_weight_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_weight",blend_weight_json);
+        
+        Json::array blend_ratio_json;
+        for (auto& item : instance.blend_ratio){
+            blend_ratio_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_ratio",blend_ratio_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    BlendStateWithClipData& Serializer::read(const Json& json_context, BlendStateWithClipData& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["clip_count"].is_null()){
+            Serializer::read(json_context["clip_count"], instance.clip_count);
+        }
+        if(!json_context["blend_clip"].is_null()){
+            assert(json_context["blend_clip"].is_array());
+            Json::array array_blend_clip = json_context["blend_clip"].array_items();
+            instance.blend_clip.resize(array_blend_clip.size());
+            for (size_t index=0; index < array_blend_clip.size();++index){
+                Serializer::read(array_blend_clip[index], instance.blend_clip[index]);
+            }
+        }
+        if(!json_context["blend_anim_skel_map"].is_null()){
+            assert(json_context["blend_anim_skel_map"].is_array());
+            Json::array array_blend_anim_skel_map = json_context["blend_anim_skel_map"].array_items();
+            instance.blend_anim_skel_map.resize(array_blend_anim_skel_map.size());
+            for (size_t index=0; index < array_blend_anim_skel_map.size();++index){
+                Serializer::read(array_blend_anim_skel_map[index], instance.blend_anim_skel_map[index]);
+            }
+        }
+        if(!json_context["blend_weight"].is_null()){
+            assert(json_context["blend_weight"].is_array());
+            Json::array array_blend_weight = json_context["blend_weight"].array_items();
+            instance.blend_weight.resize(array_blend_weight.size());
+            for (size_t index=0; index < array_blend_weight.size();++index){
+                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
+            }
+        }
+        if(!json_context["blend_ratio"].is_null()){
+            assert(json_context["blend_ratio"].is_array());
+            Json::array array_blend_ratio = json_context["blend_ratio"].array_items();
+            instance.blend_ratio.resize(array_blend_ratio.size());
+            for (size_t index=0; index < array_blend_ratio.size();++index){
+                Serializer::read(array_blend_ratio[index], instance.blend_ratio[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const BlendState& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("clip_count", Serializer::write(instance.clip_count));
+        Json::array blend_clip_file_path_json;
+        for (auto& item : instance.blend_clip_file_path){
+            blend_clip_file_path_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_clip_file_path",blend_clip_file_path_json);
+        
+        Json::array blend_clip_file_length_json;
+        for (auto& item : instance.blend_clip_file_length){
+            blend_clip_file_length_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_clip_file_length",blend_clip_file_length_json);
+        
+        Json::array blend_anim_skel_map_path_json;
+        for (auto& item : instance.blend_anim_skel_map_path){
+            blend_anim_skel_map_path_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_anim_skel_map_path",blend_anim_skel_map_path_json);
+        
+        Json::array blend_weight_json;
+        for (auto& item : instance.blend_weight){
+            blend_weight_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_weight",blend_weight_json);
+        
+        Json::array blend_mask_file_path_json;
+        for (auto& item : instance.blend_mask_file_path){
+            blend_mask_file_path_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_mask_file_path",blend_mask_file_path_json);
+        
+        Json::array blend_ratio_json;
+        for (auto& item : instance.blend_ratio){
+            blend_ratio_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("blend_ratio",blend_ratio_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    BlendState& Serializer::read(const Json& json_context, BlendState& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["clip_count"].is_null()){
+            Serializer::read(json_context["clip_count"], instance.clip_count);
+        }
+        if(!json_context["blend_clip_file_path"].is_null()){
+            assert(json_context["blend_clip_file_path"].is_array());
+            Json::array array_blend_clip_file_path = json_context["blend_clip_file_path"].array_items();
+            instance.blend_clip_file_path.resize(array_blend_clip_file_path.size());
+            for (size_t index=0; index < array_blend_clip_file_path.size();++index){
+                Serializer::read(array_blend_clip_file_path[index], instance.blend_clip_file_path[index]);
+            }
+        }
+        if(!json_context["blend_clip_file_length"].is_null()){
+            assert(json_context["blend_clip_file_length"].is_array());
+            Json::array array_blend_clip_file_length = json_context["blend_clip_file_length"].array_items();
+            instance.blend_clip_file_length.resize(array_blend_clip_file_length.size());
+            for (size_t index=0; index < array_blend_clip_file_length.size();++index){
+                Serializer::read(array_blend_clip_file_length[index], instance.blend_clip_file_length[index]);
+            }
+        }
+        if(!json_context["blend_anim_skel_map_path"].is_null()){
+            assert(json_context["blend_anim_skel_map_path"].is_array());
+            Json::array array_blend_anim_skel_map_path = json_context["blend_anim_skel_map_path"].array_items();
+            instance.blend_anim_skel_map_path.resize(array_blend_anim_skel_map_path.size());
+            for (size_t index=0; index < array_blend_anim_skel_map_path.size();++index){
+                Serializer::read(array_blend_anim_skel_map_path[index], instance.blend_anim_skel_map_path[index]);
+            }
+        }
+        if(!json_context["blend_weight"].is_null()){
+            assert(json_context["blend_weight"].is_array());
+            Json::array array_blend_weight = json_context["blend_weight"].array_items();
+            instance.blend_weight.resize(array_blend_weight.size());
+            for (size_t index=0; index < array_blend_weight.size();++index){
+                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
+            }
+        }
+        if(!json_context["blend_mask_file_path"].is_null()){
+            assert(json_context["blend_mask_file_path"].is_array());
+            Json::array array_blend_mask_file_path = json_context["blend_mask_file_path"].array_items();
+            instance.blend_mask_file_path.resize(array_blend_mask_file_path.size());
+            for (size_t index=0; index < array_blend_mask_file_path.size();++index){
+                Serializer::read(array_blend_mask_file_path[index], instance.blend_mask_file_path[index]);
+            }
+        }
+        if(!json_context["blend_ratio"].is_null()){
+            assert(json_context["blend_ratio"].is_array());
+            Json::array array_blend_ratio = json_context["blend_ratio"].array_items();
+            instance.blend_ratio.resize(array_blend_ratio.size());
+            for (size_t index=0; index < array_blend_ratio.size();++index){
+                Serializer::read(array_blend_ratio[index], instance.blend_ratio[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const RawBone& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("name", Serializer::write(instance.name));
+        ret_context.insert_or_assign("index", Serializer::write(instance.index));
+        ret_context.insert_or_assign("binding_pose", Serializer::write(instance.binding_pose));
+        ret_context.insert_or_assign("tpose_matrix", Serializer::write(instance.tpose_matrix));
+        ret_context.insert_or_assign("parent_index", Serializer::write(instance.parent_index));
+        return  Json(ret_context);
+    }
+    template<>
+    RawBone& Serializer::read(const Json& json_context, RawBone& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["name"].is_null()){
+            Serializer::read(json_context["name"], instance.name);
+        }
+        if(!json_context["index"].is_null()){
+            Serializer::read(json_context["index"], instance.index);
+        }
+        if(!json_context["binding_pose"].is_null()){
+            Serializer::read(json_context["binding_pose"], instance.binding_pose);
+        }
+        if(!json_context["tpose_matrix"].is_null()){
+            Serializer::read(json_context["tpose_matrix"], instance.tpose_matrix);
+        }
+        if(!json_context["parent_index"].is_null()){
+            Serializer::read(json_context["parent_index"], instance.parent_index);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const SkeletonData& instance){
+        Json::object  ret_context;
+        
+        Json::array bones_map_json;
+        for (auto& item : instance.bones_map){
+            bones_map_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("bones_map",bones_map_json);
+        
+        ret_context.insert_or_assign("is_flat", Serializer::write(instance.is_flat));
+        ret_context.insert_or_assign("root_index", Serializer::write(instance.root_index));
+        ret_context.insert_or_assign("in_topological_order", Serializer::write(instance.in_topological_order));
+        return  Json(ret_context);
+    }
+    template<>
+    SkeletonData& Serializer::read(const Json& json_context, SkeletonData& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["bones_map"].is_null()){
+            assert(json_context["bones_map"].is_array());
+            Json::array array_bones_map = json_context["bones_map"].array_items();
+            instance.bones_map.resize(array_bones_map.size());
+            for (size_t index=0; index < array_bones_map.size();++index){
+                Serializer::read(array_bones_map[index], instance.bones_map[index]);
+            }
+        }
+        if(!json_context["is_flat"].is_null()){
+            Serializer::read(json_context["is_flat"], instance.is_flat);
+        }
+        if(!json_context["root_index"].is_null()){
+            Serializer::read(json_context["root_index"], instance.root_index);
+        }
+        if(!json_context["in_topological_order"].is_null()){
+            Serializer::read(json_context["in_topological_order"], instance.in_topological_order);
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const BoneBlendMask& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
+        Json::array enabled_json;
+        for (auto& item : instance.enabled){
+            enabled_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("enabled",enabled_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    BoneBlendMask& Serializer::read(const Json& json_context, BoneBlendMask& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["skeleton_file_path"].is_null()){
+            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
+        }
+        if(!json_context["enabled"].is_null()){
+            assert(json_context["enabled"].is_array());
+            Json::array array_enabled = json_context["enabled"].array_items();
+            instance.enabled.resize(array_enabled.size());
+            for (size_t index=0; index < array_enabled.size();++index){
+                Serializer::read(array_enabled[index], instance.enabled[index]);
+            }
+        }
+        return instance;
+    }
+    template<>
+    Json Serializer::write(const LevelRes& instance){
+        Json::object  ret_context;
+        
+        ret_context.insert_or_assign("gravity", Serializer::write(instance.m_gravity));
+        ret_context.insert_or_assign("camera_name", Serializer::write(instance.m_camera_name));
+        Json::array m_objects_json;
+        for (auto& item : instance.m_objects){
+            m_objects_json.emplace_back(Serializer::write(item));
+        }
+        ret_context.insert_or_assign("objects",m_objects_json);
+        
+        return  Json(ret_context);
+    }
+    template<>
+    LevelRes& Serializer::read(const Json& json_context, LevelRes& instance){
+        assert(json_context.is_object());
+        
+        if(!json_context["gravity"].is_null()){
+            Serializer::read(json_context["gravity"], instance.m_gravity);
+        }
+        if(!json_context["camera_name"].is_null()){
+            Serializer::read(json_context["camera_name"], instance.m_camera_name);
+        }
+        if(!json_context["objects"].is_null()){
+            assert(json_context["objects"].is_array());
+            Json::array array_m_objects = json_context["objects"].array_items();
+            instance.m_objects.resize(array_m_objects.size());
+            for (size_t index=0; index < array_m_objects.size();++index){
+                Serializer::read(array_m_objects[index], instance.m_objects[index]);
+            }
         }
         return instance;
     }
@@ -1454,148 +1975,6 @@ namespace SimpleEngine{
         return instance;
     }
     template<>
-    Json Serializer::write(const AnimNodeMap& instance){
-        Json::object  ret_context;
-        
-        Json::array convert_json;
-        for (auto& item : instance.convert){
-            convert_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("convert",convert_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimNodeMap& Serializer::read(const Json& json_context, AnimNodeMap& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["convert"].is_null()){
-            assert(json_context["convert"].is_array());
-            Json::array array_convert = json_context["convert"].array_items();
-            instance.convert.resize(array_convert.size());
-            for (size_t index=0; index < array_convert.size();++index){
-                Serializer::read(array_convert[index], instance.convert[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationChannel& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("name", Serializer::write(instance.name));
-        Json::array position_keys_json;
-        for (auto& item : instance.position_keys){
-            position_keys_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("position_keys",position_keys_json);
-        
-        Json::array rotation_keys_json;
-        for (auto& item : instance.rotation_keys){
-            rotation_keys_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("rotation_keys",rotation_keys_json);
-        
-        Json::array scaling_keys_json;
-        for (auto& item : instance.scaling_keys){
-            scaling_keys_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("scaling_keys",scaling_keys_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationChannel& Serializer::read(const Json& json_context, AnimationChannel& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["name"].is_null()){
-            Serializer::read(json_context["name"], instance.name);
-        }
-        if(!json_context["position_keys"].is_null()){
-            assert(json_context["position_keys"].is_array());
-            Json::array array_position_keys = json_context["position_keys"].array_items();
-            instance.position_keys.resize(array_position_keys.size());
-            for (size_t index=0; index < array_position_keys.size();++index){
-                Serializer::read(array_position_keys[index], instance.position_keys[index]);
-            }
-        }
-        if(!json_context["rotation_keys"].is_null()){
-            assert(json_context["rotation_keys"].is_array());
-            Json::array array_rotation_keys = json_context["rotation_keys"].array_items();
-            instance.rotation_keys.resize(array_rotation_keys.size());
-            for (size_t index=0; index < array_rotation_keys.size();++index){
-                Serializer::read(array_rotation_keys[index], instance.rotation_keys[index]);
-            }
-        }
-        if(!json_context["scaling_keys"].is_null()){
-            assert(json_context["scaling_keys"].is_array());
-            Json::array array_scaling_keys = json_context["scaling_keys"].array_items();
-            instance.scaling_keys.resize(array_scaling_keys.size());
-            for (size_t index=0; index < array_scaling_keys.size();++index){
-                Serializer::read(array_scaling_keys[index], instance.scaling_keys[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationClip& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("total_frame", Serializer::write(instance.total_frame));
-        ret_context.insert_or_assign("node_count", Serializer::write(instance.node_count));
-        Json::array node_channels_json;
-        for (auto& item : instance.node_channels){
-            node_channels_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("node_channels",node_channels_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationClip& Serializer::read(const Json& json_context, AnimationClip& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["total_frame"].is_null()){
-            Serializer::read(json_context["total_frame"], instance.total_frame);
-        }
-        if(!json_context["node_count"].is_null()){
-            Serializer::read(json_context["node_count"], instance.node_count);
-        }
-        if(!json_context["node_channels"].is_null()){
-            assert(json_context["node_channels"].is_array());
-            Json::array array_node_channels = json_context["node_channels"].array_items();
-            instance.node_channels.resize(array_node_channels.size());
-            for (size_t index=0; index < array_node_channels.size();++index){
-                Serializer::read(array_node_channels[index], instance.node_channels[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationAsset& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("node_map", Serializer::write(instance.node_map));
-        ret_context.insert_or_assign("clip_data", Serializer::write(instance.clip_data));
-        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationAsset& Serializer::read(const Json& json_context, AnimationAsset& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["node_map"].is_null()){
-            Serializer::read(json_context["node_map"], instance.node_map);
-        }
-        if(!json_context["clip_data"].is_null()){
-            Serializer::read(json_context["clip_data"], instance.clip_data);
-        }
-        if(!json_context["skeleton_file_path"].is_null()){
-            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
-        }
-        return instance;
-    }
-    template<>
     Json Serializer::write(const GlobalParticleRes& instance){
         Json::object  ret_context;
         
@@ -1632,385 +2011,6 @@ namespace SimpleEngine{
         }
         if(!json_context["piccolo_logo_texture_path"].is_null()){
             Serializer::read(json_context["piccolo_logo_texture_path"], instance.m_piccolo_logo_texture_path);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const BoneBlendWeight& instance){
-        Json::object  ret_context;
-        
-        Json::array blend_weight_json;
-        for (auto& item : instance.blend_weight){
-            blend_weight_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_weight",blend_weight_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    BoneBlendWeight& Serializer::read(const Json& json_context, BoneBlendWeight& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["blend_weight"].is_null()){
-            assert(json_context["blend_weight"].is_array());
-            Json::array array_blend_weight = json_context["blend_weight"].array_items();
-            instance.blend_weight.resize(array_blend_weight.size());
-            for (size_t index=0; index < array_blend_weight.size();++index){
-                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const BlendStateWithClipData& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("clip_count", Serializer::write(instance.clip_count));
-        Json::array blend_clip_json;
-        for (auto& item : instance.blend_clip){
-            blend_clip_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_clip",blend_clip_json);
-        
-        Json::array blend_anim_skel_map_json;
-        for (auto& item : instance.blend_anim_skel_map){
-            blend_anim_skel_map_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_anim_skel_map",blend_anim_skel_map_json);
-        
-        Json::array blend_weight_json;
-        for (auto& item : instance.blend_weight){
-            blend_weight_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_weight",blend_weight_json);
-        
-        Json::array blend_ratio_json;
-        for (auto& item : instance.blend_ratio){
-            blend_ratio_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_ratio",blend_ratio_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    BlendStateWithClipData& Serializer::read(const Json& json_context, BlendStateWithClipData& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["clip_count"].is_null()){
-            Serializer::read(json_context["clip_count"], instance.clip_count);
-        }
-        if(!json_context["blend_clip"].is_null()){
-            assert(json_context["blend_clip"].is_array());
-            Json::array array_blend_clip = json_context["blend_clip"].array_items();
-            instance.blend_clip.resize(array_blend_clip.size());
-            for (size_t index=0; index < array_blend_clip.size();++index){
-                Serializer::read(array_blend_clip[index], instance.blend_clip[index]);
-            }
-        }
-        if(!json_context["blend_anim_skel_map"].is_null()){
-            assert(json_context["blend_anim_skel_map"].is_array());
-            Json::array array_blend_anim_skel_map = json_context["blend_anim_skel_map"].array_items();
-            instance.blend_anim_skel_map.resize(array_blend_anim_skel_map.size());
-            for (size_t index=0; index < array_blend_anim_skel_map.size();++index){
-                Serializer::read(array_blend_anim_skel_map[index], instance.blend_anim_skel_map[index]);
-            }
-        }
-        if(!json_context["blend_weight"].is_null()){
-            assert(json_context["blend_weight"].is_array());
-            Json::array array_blend_weight = json_context["blend_weight"].array_items();
-            instance.blend_weight.resize(array_blend_weight.size());
-            for (size_t index=0; index < array_blend_weight.size();++index){
-                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
-            }
-        }
-        if(!json_context["blend_ratio"].is_null()){
-            assert(json_context["blend_ratio"].is_array());
-            Json::array array_blend_ratio = json_context["blend_ratio"].array_items();
-            instance.blend_ratio.resize(array_blend_ratio.size());
-            for (size_t index=0; index < array_blend_ratio.size();++index){
-                Serializer::read(array_blend_ratio[index], instance.blend_ratio[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const BlendState& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("clip_count", Serializer::write(instance.clip_count));
-        Json::array blend_clip_file_path_json;
-        for (auto& item : instance.blend_clip_file_path){
-            blend_clip_file_path_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_clip_file_path",blend_clip_file_path_json);
-        
-        Json::array blend_clip_file_length_json;
-        for (auto& item : instance.blend_clip_file_length){
-            blend_clip_file_length_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_clip_file_length",blend_clip_file_length_json);
-        
-        Json::array blend_anim_skel_map_path_json;
-        for (auto& item : instance.blend_anim_skel_map_path){
-            blend_anim_skel_map_path_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_anim_skel_map_path",blend_anim_skel_map_path_json);
-        
-        Json::array blend_weight_json;
-        for (auto& item : instance.blend_weight){
-            blend_weight_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_weight",blend_weight_json);
-        
-        Json::array blend_mask_file_path_json;
-        for (auto& item : instance.blend_mask_file_path){
-            blend_mask_file_path_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_mask_file_path",blend_mask_file_path_json);
-        
-        Json::array blend_ratio_json;
-        for (auto& item : instance.blend_ratio){
-            blend_ratio_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("blend_ratio",blend_ratio_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    BlendState& Serializer::read(const Json& json_context, BlendState& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["clip_count"].is_null()){
-            Serializer::read(json_context["clip_count"], instance.clip_count);
-        }
-        if(!json_context["blend_clip_file_path"].is_null()){
-            assert(json_context["blend_clip_file_path"].is_array());
-            Json::array array_blend_clip_file_path = json_context["blend_clip_file_path"].array_items();
-            instance.blend_clip_file_path.resize(array_blend_clip_file_path.size());
-            for (size_t index=0; index < array_blend_clip_file_path.size();++index){
-                Serializer::read(array_blend_clip_file_path[index], instance.blend_clip_file_path[index]);
-            }
-        }
-        if(!json_context["blend_clip_file_length"].is_null()){
-            assert(json_context["blend_clip_file_length"].is_array());
-            Json::array array_blend_clip_file_length = json_context["blend_clip_file_length"].array_items();
-            instance.blend_clip_file_length.resize(array_blend_clip_file_length.size());
-            for (size_t index=0; index < array_blend_clip_file_length.size();++index){
-                Serializer::read(array_blend_clip_file_length[index], instance.blend_clip_file_length[index]);
-            }
-        }
-        if(!json_context["blend_anim_skel_map_path"].is_null()){
-            assert(json_context["blend_anim_skel_map_path"].is_array());
-            Json::array array_blend_anim_skel_map_path = json_context["blend_anim_skel_map_path"].array_items();
-            instance.blend_anim_skel_map_path.resize(array_blend_anim_skel_map_path.size());
-            for (size_t index=0; index < array_blend_anim_skel_map_path.size();++index){
-                Serializer::read(array_blend_anim_skel_map_path[index], instance.blend_anim_skel_map_path[index]);
-            }
-        }
-        if(!json_context["blend_weight"].is_null()){
-            assert(json_context["blend_weight"].is_array());
-            Json::array array_blend_weight = json_context["blend_weight"].array_items();
-            instance.blend_weight.resize(array_blend_weight.size());
-            for (size_t index=0; index < array_blend_weight.size();++index){
-                Serializer::read(array_blend_weight[index], instance.blend_weight[index]);
-            }
-        }
-        if(!json_context["blend_mask_file_path"].is_null()){
-            assert(json_context["blend_mask_file_path"].is_array());
-            Json::array array_blend_mask_file_path = json_context["blend_mask_file_path"].array_items();
-            instance.blend_mask_file_path.resize(array_blend_mask_file_path.size());
-            for (size_t index=0; index < array_blend_mask_file_path.size();++index){
-                Serializer::read(array_blend_mask_file_path[index], instance.blend_mask_file_path[index]);
-            }
-        }
-        if(!json_context["blend_ratio"].is_null()){
-            assert(json_context["blend_ratio"].is_array());
-            Json::array array_blend_ratio = json_context["blend_ratio"].array_items();
-            instance.blend_ratio.resize(array_blend_ratio.size());
-            for (size_t index=0; index < array_blend_ratio.size();++index){
-                Serializer::read(array_blend_ratio[index], instance.blend_ratio[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const ParticleComponentRes& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("local_translation", Serializer::write(instance.m_local_translation));
-        ret_context.insert_or_assign("local_rotation", Serializer::write(instance.m_local_rotation));
-        ret_context.insert_or_assign("velocity", Serializer::write(instance.m_velocity));
-        ret_context.insert_or_assign("acceleration", Serializer::write(instance.m_acceleration));
-        ret_context.insert_or_assign("size", Serializer::write(instance.m_size));
-        ret_context.insert_or_assign("emitter_type", Serializer::write(instance.m_emitter_type));
-        ret_context.insert_or_assign("life", Serializer::write(instance.m_life));
-        ret_context.insert_or_assign("color", Serializer::write(instance.m_color));
-        return  Json(ret_context);
-    }
-    template<>
-    ParticleComponentRes& Serializer::read(const Json& json_context, ParticleComponentRes& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["local_translation"].is_null()){
-            Serializer::read(json_context["local_translation"], instance.m_local_translation);
-        }
-        if(!json_context["local_rotation"].is_null()){
-            Serializer::read(json_context["local_rotation"], instance.m_local_rotation);
-        }
-        if(!json_context["velocity"].is_null()){
-            Serializer::read(json_context["velocity"], instance.m_velocity);
-        }
-        if(!json_context["acceleration"].is_null()){
-            Serializer::read(json_context["acceleration"], instance.m_acceleration);
-        }
-        if(!json_context["size"].is_null()){
-            Serializer::read(json_context["size"], instance.m_size);
-        }
-        if(!json_context["emitter_type"].is_null()){
-            Serializer::read(json_context["emitter_type"], instance.m_emitter_type);
-        }
-        if(!json_context["life"].is_null()){
-            Serializer::read(json_context["life"], instance.m_life);
-        }
-        if(!json_context["color"].is_null()){
-            Serializer::read(json_context["color"], instance.m_color);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationResultElement& instance){
-        Json::object  ret_context;
-        
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationResultElement& Serializer::read(const Json& json_context, AnimationResultElement& instance){
-        assert(json_context.is_object());
-        
-        
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationResult& instance){
-        Json::object  ret_context;
-        
-        Json::array node_json;
-        for (auto& item : instance.node){
-            node_json.emplace_back(Serializer::write(item));
-        }
-        ret_context.insert_or_assign("node",node_json);
-        
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationResult& Serializer::read(const Json& json_context, AnimationResult& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["node"].is_null()){
-            assert(json_context["node"].is_array());
-            Json::array array_node = json_context["node"].array_items();
-            instance.node.resize(array_node.size());
-            for (size_t index=0; index < array_node.size();++index){
-                Serializer::read(array_node[index], instance.node[index]);
-            }
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const AnimationComponentRes& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("skeleton_file_path", Serializer::write(instance.skeleton_file_path));
-        ret_context.insert_or_assign("blend_state", Serializer::write(instance.blend_state));
-        ret_context.insert_or_assign("frame_position", Serializer::write(instance.frame_position));
-        return  Json(ret_context);
-    }
-    template<>
-    AnimationComponentRes& Serializer::read(const Json& json_context, AnimationComponentRes& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["skeleton_file_path"].is_null()){
-            Serializer::read(json_context["skeleton_file_path"], instance.skeleton_file_path);
-        }
-        if(!json_context["blend_state"].is_null()){
-            Serializer::read(json_context["blend_state"], instance.blend_state);
-        }
-        if(!json_context["frame_position"].is_null()){
-            Serializer::read(json_context["frame_position"], instance.frame_position);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const ControllerConfig& instance){
-        Json::object  ret_context;
-        
-        
-        return  Json(ret_context);
-    }
-    template<>
-    ControllerConfig& Serializer::read(const Json& json_context, ControllerConfig& instance){
-        assert(json_context.is_object());
-        
-        
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const PhysicsControllerConfig& instance){
-        Json::object  ret_context;
-        auto&&  json_context_0 = Serializer::write(*(SimpleEngine::ControllerConfig*)&instance);
-        assert(json_context_0.is_object());
-        auto&& json_context_map_0 = json_context_0.object_items();
-        ret_context.insert(json_context_map_0.begin() , json_context_map_0.end());
-        ret_context.insert_or_assign("capsule_shape", Serializer::write(instance.m_capsule_shape));
-        return  Json(ret_context);
-    }
-    template<>
-    PhysicsControllerConfig& Serializer::read(const Json& json_context, PhysicsControllerConfig& instance){
-        assert(json_context.is_object());
-        Serializer::read(json_context,*(SimpleEngine::ControllerConfig*)&instance);
-        if(!json_context["capsule_shape"].is_null()){
-            Serializer::read(json_context["capsule_shape"], instance.m_capsule_shape);
-        }
-        return instance;
-    }
-    template<>
-    Json Serializer::write(const MotorComponentRes& instance){
-        Json::object  ret_context;
-        
-        ret_context.insert_or_assign("move_speed", Serializer::write(instance.m_move_speed));
-        ret_context.insert_or_assign("jump_height", Serializer::write(instance.m_jump_height));
-        ret_context.insert_or_assign("max_move_speed_ratio", Serializer::write(instance.m_max_move_speed_ratio));
-        ret_context.insert_or_assign("max_sprint_speed_ratio", Serializer::write(instance.m_max_sprint_speed_ratio));
-        ret_context.insert_or_assign("move_acceleration", Serializer::write(instance.m_move_acceleration));
-        ret_context.insert_or_assign("sprint_acceleration", Serializer::write(instance.m_sprint_acceleration));
-        ret_context.insert_or_assign("controller_config", Serializer::write(instance.m_controller_config));
-        return  Json(ret_context);
-    }
-    template<>
-    MotorComponentRes& Serializer::read(const Json& json_context, MotorComponentRes& instance){
-        assert(json_context.is_object());
-        
-        if(!json_context["move_speed"].is_null()){
-            Serializer::read(json_context["move_speed"], instance.m_move_speed);
-        }
-        if(!json_context["jump_height"].is_null()){
-            Serializer::read(json_context["jump_height"], instance.m_jump_height);
-        }
-        if(!json_context["max_move_speed_ratio"].is_null()){
-            Serializer::read(json_context["max_move_speed_ratio"], instance.m_max_move_speed_ratio);
-        }
-        if(!json_context["max_sprint_speed_ratio"].is_null()){
-            Serializer::read(json_context["max_sprint_speed_ratio"], instance.m_max_sprint_speed_ratio);
-        }
-        if(!json_context["move_acceleration"].is_null()){
-            Serializer::read(json_context["move_acceleration"], instance.m_move_acceleration);
-        }
-        if(!json_context["sprint_acceleration"].is_null()){
-            Serializer::read(json_context["sprint_acceleration"], instance.m_sprint_acceleration);
-        }
-        if(!json_context["controller_config"].is_null()){
-            Serializer::read(json_context["controller_config"], instance.m_controller_config);
         }
         return instance;
     }

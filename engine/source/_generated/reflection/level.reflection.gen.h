@@ -28,11 +28,11 @@ namespace TypeFieldReflectionOparator{
         static void set_m_gravity(void* instance, void* field_value){ static_cast<LevelRes*>(instance)->m_gravity = *static_cast<Vector3*>(field_value);}
         static void* get_m_gravity(void* instance){ return static_cast<void*>(&(static_cast<LevelRes*>(instance)->m_gravity));}
         static bool isArray_m_gravity(){ return false; }
-        static const char* getFieldName_m_character_name(){ return "m_character_name";}
-        static const char* getFieldTypeName_m_character_name(){ return "std::string";}
-        static void set_m_character_name(void* instance, void* field_value){ static_cast<LevelRes*>(instance)->m_character_name = *static_cast<std::string*>(field_value);}
-        static void* get_m_character_name(void* instance){ return static_cast<void*>(&(static_cast<LevelRes*>(instance)->m_character_name));}
-        static bool isArray_m_character_name(){ return false; }
+        static const char* getFieldName_m_camera_name(){ return "m_camera_name";}
+        static const char* getFieldTypeName_m_camera_name(){ return "std::string";}
+        static void set_m_camera_name(void* instance, void* field_value){ static_cast<LevelRes*>(instance)->m_camera_name = *static_cast<std::string*>(field_value);}
+        static void* get_m_camera_name(void* instance){ return static_cast<void*>(&(static_cast<LevelRes*>(instance)->m_camera_name));}
+        static bool isArray_m_camera_name(){ return false; }
         static const char* getFieldName_m_objects(){ return "m_objects";}
         static const char* getFieldTypeName_m_objects(){ return "std::vector<ObjectInstanceRes>";}
         static void set_m_objects(void* instance, void* field_value){ static_cast<LevelRes*>(instance)->m_objects = *static_cast<std::vector<ObjectInstanceRes>*>(field_value);}
@@ -76,14 +76,14 @@ namespace ArrayReflectionOperator{
     &TypeFieldReflectionOparator::TypeLevelResOperator::getFieldTypeName_m_gravity,
     &TypeFieldReflectionOparator::TypeLevelResOperator::isArray_m_gravity);
     REGISTER_FIELD_TO_MAP("LevelRes", field_function_tuple_m_gravity);
-    FieldFunctionTuple* field_function_tuple_m_character_name=new FieldFunctionTuple(
-    &TypeFieldReflectionOparator::TypeLevelResOperator::set_m_character_name,
-    &TypeFieldReflectionOparator::TypeLevelResOperator::get_m_character_name,
+    FieldFunctionTuple* field_function_tuple_m_camera_name=new FieldFunctionTuple(
+    &TypeFieldReflectionOparator::TypeLevelResOperator::set_m_camera_name,
+    &TypeFieldReflectionOparator::TypeLevelResOperator::get_m_camera_name,
     &TypeFieldReflectionOparator::TypeLevelResOperator::getClassName,
-    &TypeFieldReflectionOparator::TypeLevelResOperator::getFieldName_m_character_name,
-    &TypeFieldReflectionOparator::TypeLevelResOperator::getFieldTypeName_m_character_name,
-    &TypeFieldReflectionOparator::TypeLevelResOperator::isArray_m_character_name);
-    REGISTER_FIELD_TO_MAP("LevelRes", field_function_tuple_m_character_name);
+    &TypeFieldReflectionOparator::TypeLevelResOperator::getFieldName_m_camera_name,
+    &TypeFieldReflectionOparator::TypeLevelResOperator::getFieldTypeName_m_camera_name,
+    &TypeFieldReflectionOparator::TypeLevelResOperator::isArray_m_camera_name);
+    REGISTER_FIELD_TO_MAP("LevelRes", field_function_tuple_m_camera_name);
     FieldFunctionTuple* field_function_tuple_m_objects=new FieldFunctionTuple(
     &TypeFieldReflectionOparator::TypeLevelResOperator::set_m_objects,
     &TypeFieldReflectionOparator::TypeLevelResOperator::get_m_objects,
