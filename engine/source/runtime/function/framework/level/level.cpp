@@ -41,6 +41,7 @@ namespace SimpleEngine
             LOG_ERROR("loading object " + object_instance_res.m_name + " failed");
             return k_invalid_gobject_id;
         }
+         
         return object_id;
     }
 
@@ -59,6 +60,19 @@ namespace SimpleEngine
         for (const ObjectInstanceRes& object_instance_res : level_res.m_objects)
         {
             createObject(object_instance_res);
+        }
+
+        for (const auto& object_pair : m_gobjects)
+        {
+            std::shared_ptr<GObject> object = object_pair.second;
+            if (object == nullptr)
+                continue;
+
+            if (level_res.m_camera_name == object->getName())
+            {
+                m_cameraObject = object;
+                break;
+            }
         }
 
         m_is_loaded = true;
@@ -122,6 +136,7 @@ namespace SimpleEngine
             {
                 id_object_pair.second->tick(delta_time);
             }
+        
         }
     }
 
@@ -141,5 +156,4 @@ namespace SimpleEngine
         auto iter = m_gobjects.find(go_id);
         m_gobjects.erase(go_id);
     }
-
 }

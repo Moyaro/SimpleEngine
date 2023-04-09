@@ -33,6 +33,9 @@ namespace SimpleEngine
         std::weak_ptr<GObject>   getGObjectByID(GObjectID go_id) const;
 
         GObjectID createObject(const ObjectInstanceRes& object_instance_res);
+
+        std::shared_ptr<GObject> getCameraObject() { return m_cameraObject;};
+
         void      deleteGObjectByID(GObjectID go_id);
 
     protected:
@@ -40,6 +43,8 @@ namespace SimpleEngine
 
         bool        m_is_loaded{ false };
         std::string m_level_res_url;
+
+        std::shared_ptr<GObject> m_cameraObject = nullptr;
 
         // all game objects in this level, key: object id, value: object instance
         LevelObjectsMap m_gobjects;

@@ -38,29 +38,30 @@ namespace SimpleEngine {
     void LevelDebugger::showCameraInfo(std::shared_ptr<Level> level) const
     {
         //std::shared_ptr<GObject> gobject = level->getCurrentActiveCharacter().lock()->getObject().lock();
-        //drawCameraInfo(gobject);
+        std::shared_ptr<GObject> cameraGobject = level->getCameraObject();
+        drawCameraInfo(cameraGobject);
     }
 
     void LevelDebugger::drawBoundingBox(std::shared_ptr<GObject> object) const
     {
-        /*const RigidBodyComponent* rigidbody_component = object->tryGetComponentConst<RigidBodyComponent>("RigidBodyComponent");
-        if (rigidbody_component == nullptr)
-            return;
+        //const RigidBodyComponent* rigidbody_component = object->tryGetComponentConst<RigidBodyComponent>("RigidBodyComponent");
+        //if (rigidbody_component == nullptr)
+        //    return;
 
-        std::vector<AxisAlignedBox> bounding_boxes;
-        rigidbody_component->getShapeBoundingBoxes(bounding_boxes);
-        for (size_t bounding_box_index = 0; bounding_box_index < bounding_boxes.size(); bounding_box_index++)
-        {
-            AxisAlignedBox  bounding_box = bounding_boxes[bounding_box_index];
-            DebugDrawGroup* debug_draw_group =
-                g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("bounding box");
-            Vector3 center =
-                Vector3(bounding_box.getCenter().x, bounding_box.getCenter().y, bounding_box.getCenter().z);
-            Vector3 halfExtent =
-                Vector3(bounding_box.getHalfExtent().x, bounding_box.getHalfExtent().y, bounding_box.getHalfExtent().z);
+        //std::vector<AxisAlignedBox> bounding_boxes;
+        //rigidbody_component->getShapeBoundingBoxes(bounding_boxes);
+        //for (size_t bounding_box_index = 0; bounding_box_index < bounding_boxes.size(); bounding_box_index++)
+        //{
+        //    AxisAlignedBox  bounding_box = bounding_boxes[bounding_box_index];
+        //    DebugDrawGroup* debug_draw_group =
+        //        g_runtime_global_context.m_debugdraw_manager->tryGetOrCreateDebugDrawGroup("bounding box");
+        //    Vector3 center =
+        //        Vector3(bounding_box.getCenter().x, bounding_box.getCenter().y, bounding_box.getCenter().z);
+        //    Vector3 halfExtent =
+        //        Vector3(bounding_box.getHalfExtent().x, bounding_box.getHalfExtent().y, bounding_box.getHalfExtent().z);
 
-            debug_draw_group->addBox(center, halfExtent, Vector4(1.0f, 0.0f, 0.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
-        }
+        //    debug_draw_group->addBox(center, halfExtent, Vector4(1.0f, 0.0f, 0.0f, 0.0f), Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+        //}
     }
 
     void LevelDebugger::drawCameraInfo(std::shared_ptr<GObject> object) const
@@ -96,6 +97,6 @@ namespace SimpleEngine {
         Vector3 direction = forward - position;
         buffer << "camera position: (" << position.x << "," << position.y << "," << position.z << ")" << std::endl;
         buffer << "camera direction : (" << direction.x << "," << direction.y << "," << direction.z << ")";
-        debug_draw_group->addText(buffer.str(), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector3(-1.0f, -0.2f, 0.0f), 10, true);*/
+        debug_draw_group->addText(buffer.str(), Vector4(1.0f, 0.0f, 0.0f, 1.0f), Vector3(-1.0f, -0.2f, 0.0f), 10, true);
     }
 }
