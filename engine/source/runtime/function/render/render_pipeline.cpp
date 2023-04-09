@@ -9,6 +9,7 @@
 #include "runtime/function/render/passes/ui_pass.h"
 #include "runtime/function/render/passes/point_light_pass.h"
 #include "runtime/function/render/passes/directional_light_pass.h"
+#include "runtime/function/render/passes/combine_ui_pass.h"
 
 namespace SimpleEngine {
     void RenderPipeline::init(RenderPipelineInitInfo init_info)
@@ -17,6 +18,7 @@ namespace SimpleEngine {
         m_directional_light_pass = std::make_shared<DirectionalLightShadowPass>();
         m_main_camera_pass = std::make_shared<MainCameraPass>();
         m_ui_pass = std::make_shared<UIPass>();
+        m_combine_ui_pass = std::make_shared<CombineUIPass>();
         m_pick_pass = std::make_shared<PickPass>();
 
         RenderPassCommonInfo pass_common_info;
@@ -27,6 +29,7 @@ namespace SimpleEngine {
         m_directional_light_pass->setCommonInfo(pass_common_info);
         m_main_camera_pass->setCommonInfo(pass_common_info);
         m_ui_pass->setCommonInfo(pass_common_info);
+        m_combine_ui_pass->setCommonInfo(pass_common_info);
         m_pick_pass->setCommonInfo(pass_common_info);
 
         m_point_light_shadow_pass->init(nullptr);
@@ -54,6 +57,12 @@ namespace SimpleEngine {
         ui_init_info.render_pass = _main_camera_pass->getRenderPass();
         m_ui_pass->init(&ui_init_info);
 
+        CombineUIPassInitInfo combine_ui_init_info;
+        combine_ui_init_info.render_pass = _main_camera_pass->getRenderPass();
+        combine_ui_init_info.scene_input_attachment = _main_camera_pass->getFramebufferImageViews()[_main_camera_pass_backup_buffer_odd];
+        combine_ui_init_info.ui_input_attachment = _main_camera_pass->getFramebufferImageViews()[_main_camera_pass_backup_buffer_even];
+        m_combine_ui_pass->init(&combine_ui_init_info);
+
         PickPassInitInfo pick_init_info;
         pick_init_info.per_mesh_layout = descriptor_layouts[MainCameraPass::LayoutType::_per_mesh];
         m_pick_pass->init(&pick_init_info);
@@ -76,7 +85,9 @@ namespace SimpleEngine {
         static_cast<PointLightShadowPass*>(m_point_light_shadow_pass.get())->draw();
 
         UIPass& ui_pass = *(static_cast<UIPass*>(m_ui_pass.get()));
-        static_cast<MainCameraPass*>(m_main_camera_pass.get())->drawForward(ui_pass,vulkan_rhi->m_current_swapchain_image_index);
+        CombineUIPass& combine_ui_pass = *(static_cast<CombineUIPass*>(m_combine_ui_pass.get()));
+        static_cast<MainCameraPass*>(m_main_camera_pass.get())
+            ->drawForward(ui_pass, combine_ui_pass, vulkan_rhi->m_current_swapchain_image_index);
 
         g_runtime_global_context.m_debugdraw_manager->draw(vulkan_rhi->m_current_swapchain_image_index);
 
@@ -87,8 +98,12 @@ namespace SimpleEngine {
     {
         MainCameraPass& main_camera_pass = *(static_cast<MainCameraPass*>(m_main_camera_pass.get()));
         PickPass& pick_pass = *(static_cast<PickPass*>(m_pick_pass.get()));
+        CombineUIPass&  combine_ui_pass  = *(static_cast<CombineUIPass*>(m_combine_ui_pass.get()));
 
         main_camera_pass.updateAfterFramebufferRecreate();
+        combine_ui_pass.updateAfterFramebufferRecreate(
+            main_camera_pass.getFramebufferImageViews()[_main_camera_pass_backup_buffer_odd],
+            main_camera_pass.getFramebufferImageViews()[_main_camera_pass_backup_buffer_even]);
         pick_pass.recreateFramebuffer();
         g_runtime_global_context.m_debugdraw_manager->updateAfterRecreateSwapchain();
     }

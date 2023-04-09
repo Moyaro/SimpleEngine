@@ -46,7 +46,8 @@ namespace SimpleEngine {
 
     void MainCameraPass::setupAttachments()
     {
-        m_framebuffer.attachments.resize(_main_camera_pass_custom_attachment_count);
+        m_framebuffer.attachments.resize(_main_camera_pass_custom_attachment_count +
+                                         _main_camera_pass_post_process_attachment_count);
 
         m_framebuffer.attachments[_main_camera_pass_gbuffer_a].format = VK_FORMAT_R8G8B8A8_UNORM;
         m_framebuffer.attachments[_main_camera_pass_gbuffer_b].format = VK_FORMAT_R8G8B8A8_UNORM;
@@ -95,8 +96,12 @@ namespace SimpleEngine {
                 1,
                 m_framebuffer.attachments[buffer_index].view);
         }
+
+        m_framebuffer.attachments[_main_camera_pass_post_process_buffer_odd].format  = VK_FORMAT_R16G16B16A16_SFLOAT;
+        m_framebuffer.attachments[_main_camera_pass_post_process_buffer_even].format = VK_FORMAT_R16G16B16A16_SFLOAT;
         for (int attachment_index = _main_camera_pass_custom_attachment_count;
-            attachment_index < _main_camera_pass_custom_attachment_count;
+             attachment_index <
+             _main_camera_pass_custom_attachment_count + _main_camera_pass_post_process_attachment_count;
             ++attachment_index)
         {
             m_rhi->createImage(m_rhi->getSwapchainInfo().extent.width,
@@ -182,6 +187,30 @@ namespace SimpleEngine {
         backup_even_color_attachment_description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         backup_even_color_attachment_description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         backup_even_color_attachment_description.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        VkAttachmentDescription& post_process_odd_color_attachment_description =
+            attachments[_main_camera_pass_post_process_buffer_odd];
+        post_process_odd_color_attachment_description.format =
+            m_framebuffer.attachments[_main_camera_pass_post_process_buffer_odd].format;
+        post_process_odd_color_attachment_description.samples        = VK_SAMPLE_COUNT_1_BIT;
+        post_process_odd_color_attachment_description.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        post_process_odd_color_attachment_description.storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        post_process_odd_color_attachment_description.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        post_process_odd_color_attachment_description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        post_process_odd_color_attachment_description.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        post_process_odd_color_attachment_description.finalLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        VkAttachmentDescription& post_process_even_color_attachment_description =
+            attachments[_main_camera_pass_post_process_buffer_even];
+        post_process_even_color_attachment_description.format =
+            m_framebuffer.attachments[_main_camera_pass_post_process_buffer_even].format;
+        post_process_even_color_attachment_description.samples        = VK_SAMPLE_COUNT_1_BIT;
+        post_process_even_color_attachment_description.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        post_process_even_color_attachment_description.storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        post_process_even_color_attachment_description.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        post_process_even_color_attachment_description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        post_process_even_color_attachment_description.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        post_process_even_color_attachment_description.finalLayout    = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         VkAttachmentDescription& depth_attachment_description = attachments[_main_camera_pass_depth];
         depth_attachment_description.format = m_rhi->getDepthImageInfo().depth_image_format;
@@ -289,7 +318,30 @@ namespace SimpleEngine {
         ui_pass.preserveAttachmentCount = 1;
         ui_pass.pPreserveAttachments = &ui_pass_preserve_attachment;
 
-        VkSubpassDependency dependencies[4] = {};
+        VkAttachmentReference combine_ui_pass_input_attachments_reference[2] = {};
+        combine_ui_pass_input_attachments_reference[0].attachment =
+            &backup_odd_color_attachment_description - attachments;
+        combine_ui_pass_input_attachments_reference[0].layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        combine_ui_pass_input_attachments_reference[1].attachment =
+            &backup_even_color_attachment_description - attachments;
+        combine_ui_pass_input_attachments_reference[1].layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+        VkAttachmentReference combine_ui_pass_color_attachment_reference {};
+        combine_ui_pass_color_attachment_reference.attachment = &swapchain_image_attachment_description - attachments;
+        combine_ui_pass_color_attachment_reference.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription& combine_ui_pass = subpasses[_main_camera_subpass_combine_ui];
+        combine_ui_pass.pipelineBindPoint      = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        combine_ui_pass.inputAttachmentCount   = sizeof(combine_ui_pass_input_attachments_reference) /
+                                               sizeof(combine_ui_pass_input_attachments_reference[0]);
+        combine_ui_pass.pInputAttachments       = combine_ui_pass_input_attachments_reference;
+        combine_ui_pass.colorAttachmentCount    = 1;
+        combine_ui_pass.pColorAttachments       = &combine_ui_pass_color_attachment_reference;
+        combine_ui_pass.pDepthStencilAttachment = NULL;
+        combine_ui_pass.preserveAttachmentCount = 0;
+        combine_ui_pass.pPreserveAttachments    = NULL;
+
+        VkSubpassDependency dependencies[5] = {};
 
         VkSubpassDependency& deferred_lighting_pass_depend_on_shadow_map_pass = dependencies[0];
         deferred_lighting_pass_depend_on_shadow_map_pass.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -334,6 +386,19 @@ namespace SimpleEngine {
         ui_pass_depend_on_fxaa_pass.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         ui_pass_depend_on_fxaa_pass.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
         ui_pass_depend_on_fxaa_pass.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+        VkSubpassDependency& combine_ui_pass_depend_on_ui_pass = dependencies[4];
+        combine_ui_pass_depend_on_ui_pass.srcSubpass            = _main_camera_subpass_ui;
+        combine_ui_pass_depend_on_ui_pass.dstSubpass            = _main_camera_subpass_combine_ui;
+        combine_ui_pass_depend_on_ui_pass.srcStageMask =
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        combine_ui_pass_depend_on_ui_pass.dstStageMask =
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        combine_ui_pass_depend_on_ui_pass.srcAccessMask =
+            VK_ACCESS_SHADER_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        combine_ui_pass_depend_on_ui_pass.dstAccessMask =
+            VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+        combine_ui_pass_depend_on_ui_pass.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
         VkRenderPassCreateInfo renderpass_create_info{};
         renderpass_create_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -1570,6 +1635,8 @@ namespace SimpleEngine {
                 m_framebuffer.attachments[_main_camera_pass_gbuffer_c].view,
                 m_framebuffer.attachments[_main_camera_pass_backup_buffer_odd].view,
                 m_framebuffer.attachments[_main_camera_pass_backup_buffer_even].view,
+                m_framebuffer.attachments[_main_camera_pass_post_process_buffer_odd].view,
+                m_framebuffer.attachments[_main_camera_pass_post_process_buffer_even].view,
                 m_rhi->getDepthImageInfo().depth_image_view,
                 m_rhi->getSwapchainInfo().imageViews[i] };
 
@@ -1612,7 +1679,7 @@ namespace SimpleEngine {
         setupSwapchainFramebuffers();
     }
 
-    void MainCameraPass::drawForward(UIPass& ui_pass,uint32_t current_swapchain_image_index)
+    void MainCameraPass::drawForward(UIPass& ui_pass, CombineUIPass& combine_ui_pass, uint32_t current_swapchain_image_index)
     {
         {
             VkRenderPassBeginInfo renderpass_begin_info{};
@@ -1628,6 +1695,8 @@ namespace SimpleEngine {
             clear_values[_main_camera_pass_gbuffer_c].color = { {0.0f, 0.0f, 0.0f, 0.0f} };
             clear_values[_main_camera_pass_backup_buffer_odd].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
             clear_values[_main_camera_pass_backup_buffer_even].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+            clear_values[_main_camera_pass_post_process_buffer_odd].color  = {{0.0f, 0.0f, 0.0f, 1.0f}};
+            clear_values[_main_camera_pass_post_process_buffer_even].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
             clear_values[_main_camera_pass_depth].depthStencil = { 1.0f, 0 };
             clear_values[_main_camera_pass_swap_chain_image].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
             renderpass_begin_info.clearValueCount = (sizeof(clear_values) / sizeof(clear_values[0]));
@@ -1672,6 +1741,11 @@ namespace SimpleEngine {
 
         drawAxis();
         ui_pass.draw();
+
+        m_rhi->cmdNextSubpass(m_rhi->getCurrentCommandBuffer(), VK_SUBPASS_CONTENTS_INLINE);
+
+        combine_ui_pass.draw();
+
         m_rhi->cmdEndRenderPass(m_rhi->getCurrentCommandBuffer());
     }
 

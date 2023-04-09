@@ -39,6 +39,7 @@ namespace SimpleEngine {
         std::shared_ptr<RenderPassBase> m_point_light_shadow_pass;
         std::shared_ptr<RenderPassBase> m_main_camera_pass;
         std::shared_ptr<RenderPassBase> m_ui_pass;
+        std::shared_ptr<RenderPassBase> m_combine_ui_pass;
         std::shared_ptr<RenderPassBase> m_pick_pass;
     };
 }
