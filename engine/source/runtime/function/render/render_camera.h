@@ -42,7 +42,6 @@ namespace SimpleEngine {
         std::vector<Matrix4x4> m_view_matrices{ Matrix4x4::IDENTITY };//观察矩阵数组
         void setMainViewMatrix(const Matrix4x4& view_matrix, RenderCameraType type = RenderCameraType::Editor);//设置主观察矩阵
 
-        //Motor模式用
         void move(Vector3 delta) { m_position += delta; }//移动
         void rotate(Vector2 delta);//旋转
         void zoom(float offset);//调整相机视角

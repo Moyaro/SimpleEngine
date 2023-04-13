@@ -12,16 +12,6 @@
 namespace SimpleEngine
 {
     WorldManager::~WorldManager() { clear(); }
-
-    void WorldManager::init()
-    {
-        m_is_world_loaded   = false;
-        m_current_world_url = g_runtime_global_context.m_config_manager->getDefaultWorldUrl();
-
-        //debugger
-        m_level_debugger = std::make_shared<LevelDebugger>();
-    }
-
     void WorldManager::clear()
     {
         // unload all loaded levels
@@ -42,14 +32,25 @@ namespace SimpleEngine
         m_level_debugger.reset();
     }
 
+
+    void WorldManager::init()
+    {
+        m_is_world_loaded   = false;
+        m_current_world_url = g_runtime_global_context.m_config_manager->getDefaultWorldUrl();
+
+        //debugger
+        m_level_debugger = std::make_shared<LevelDebugger>();
+    }
+
     void WorldManager::tick(float delta_time)
     {
+        //加载世界
         if (!m_is_world_loaded)
         {
             loadWorld(m_current_world_url);
         }
 
-        // tick the active level
+        //tick激活的关卡
         std::shared_ptr<Level> active_level = m_current_active_level.lock();
         if (active_level)
         {
@@ -92,7 +93,7 @@ namespace SimpleEngine
     {
         std::shared_ptr<Level> level = std::make_shared<Level>();
         // set current level temporary
-        m_current_active_level       = level;
+        m_current_active_level = level;
 
         const bool is_level_load_success = level->load(level_url);
         if (is_level_load_success == false)
@@ -110,7 +111,7 @@ namespace SimpleEngine
         auto active_level = m_current_active_level.lock();
         if (active_level == nullptr)
         {
-            LOG_WARN("current level is nil");
+            LOG_WARN("目前关卡为空！");
             return;
         }
 
@@ -121,7 +122,7 @@ namespace SimpleEngine
         const bool is_load_success = loadLevel(level_url);
         if (!is_load_success)
         {
-            LOG_ERROR("load level failed {}", level_url);
+            LOG_ERROR("加载关卡失败 {}", level_url);
             return;
         }
 
@@ -131,7 +132,7 @@ namespace SimpleEngine
 
         m_current_active_level = iter->second;
 
-        LOG_INFO("reload current evel succeed");
+        LOG_INFO("成功重载当前关卡");
     }
 
     void WorldManager::saveCurrentLevel()
@@ -140,7 +141,7 @@ namespace SimpleEngine
 
         if (active_level == nullptr)
         {
-            LOG_ERROR("save level failed, no active level");
+            LOG_ERROR("保存关卡失败，没有激活的关卡");
             return;
         }
 

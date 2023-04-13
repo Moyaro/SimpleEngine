@@ -316,9 +316,11 @@ namespace SimpleEngine {
 
     void EditorUI::onFileContentItemClicked(EditorFileNode* node)
     {
+       //点object，直接返回
         if (node->m_file_type != "object")
             return;
 
+        //获取当前激活的关卡
         std::shared_ptr<Level> level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
         if (level == nullptr)
             return;
@@ -326,10 +328,8 @@ namespace SimpleEngine {
         const unsigned int new_object_index = ++m_new_object_index_map[node->m_file_name];
 
         ObjectInstanceRes new_object_instance_res;
-        new_object_instance_res.m_name =
-            "New_" + Path::getFilePureName(node->m_file_name) + "_" + std::to_string(new_object_index);
-        new_object_instance_res.m_definition =
-            g_runtime_global_context.m_asset_manager->getFullPath(node->m_file_path).generic_string();
+        new_object_instance_res.m_name = "New_" + Path::getFilePureName(node->m_file_name) + "_" + std::to_string(new_object_index);
+        new_object_instance_res.m_definition =  g_runtime_global_context.m_asset_manager->getFullPath(node->m_file_path).generic_string();
 
         size_t new_gobject_id = level->createObject(new_object_instance_res);
         if (new_gobject_id != k_invalid_gobject_id)
@@ -342,10 +342,7 @@ namespace SimpleEngine {
 
     inline void windowContentScaleUpdate(float scale)
     {
-#if defined(__GNUC__) && defined(__MACH__)
-        float font_scale = fmaxf(1.0f, scale);
-        ImGui::GetIO().FontGlobalScale = 1.0f / font_scale;
-#endif
+
         // TOOD: Reload fonts if DPI scale is larger than previous font loading DPI scale
     }
 
@@ -357,33 +354,33 @@ namespace SimpleEngine {
     void EditorUI::init(WindowUIInitInfo init_info) {
         std::shared_ptr<ConfigManager> config_manager = g_runtime_global_context.m_config_manager;
 
-        // create imgui context
+        //创建imgui上下文
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
 
-        // set ui content scale
+        //设置UI缩放比例
         float x_scale, y_scale;
         glfwGetWindowContentScale(init_info.window_system->getWindow(), &x_scale, &y_scale);
-        float content_scale = fmaxf(1.0f, fmaxf(x_scale, y_scale));
+        float content_scale = fmaxf(1.0f, fmaxf(x_scale, y_scale));//确保缩放比例不低于1
         windowContentScaleUpdate(content_scale);
         glfwSetWindowContentScaleCallback(init_info.window_system->getWindow(), windowContentScaleCallback);
 
-        // load font for imgui
+        //加载字体
         ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.ConfigDockingAlwaysTabBar = true;
-        io.ConfigWindowsMoveFromTitleBarOnly = true;
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;//多个窗口可组合成一个窗口
+        io.ConfigDockingAlwaysTabBar = true;//Tab Bar始终可见
+        io.ConfigWindowsMoveFromTitleBarOnly = true;//配置窗口的移动只能通过标题栏进行
         io.Fonts->AddFontFromFileTTF(config_manager->getEditorFontPath().generic_string().data(), content_scale * 16, nullptr, nullptr);
         io.Fonts->Build();
 
         ImGuiStyle& style = ImGui::GetStyle();
-        style.WindowPadding = ImVec2(1.0, 0);
-        style.FramePadding = ImVec2(14.0, 2.0f);
-        style.ChildBorderSize = 0.0f;
-        style.FrameRounding = 5.0f;
+        style.WindowPadding = ImVec2(1.0, 0);//窗口的内边距
+        style.FramePadding = ImVec2(14.0, 2.0f);//控件的内边距
+        style.ChildBorderSize = 0.0f;//子窗口的边框大小
+        style.FrameRounding = 5.0f;//控件的圆角半径
         style.FrameBorderSize = 1.5f;
 
-        // set imgui color style
+        //设置UI颜色样式
         setUIColorStyle();
 
         // 安装窗口icon
@@ -410,13 +407,17 @@ namespace SimpleEngine {
     {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        const bool is_folder = (node->m_child_nodes.size() > 0);
+        const bool is_folder = (node->m_child_nodes.size() > 0);//有子结点说明是文件夹
         if (is_folder)
         {
-            bool open = ImGui::TreeNodeEx(node->m_file_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);
+            bool open = ImGui::TreeNodeEx(node->m_file_name.c_str(), ImGuiTreeNodeFlags_SpanFullWidth);//创建可以展开/折叠的节点
+
+            //下一列，宽度100，显示类型名
             ImGui::TableNextColumn();
             ImGui::SetNextItemWidth(100.0f);
             ImGui::TextUnformatted(node->m_file_type.c_str());
+
+            //结点展开就递归调用构建新树
             if (open)
             {
                 for (int child_n = 0; child_n < node->m_child_nodes.size(); child_n++)
@@ -424,11 +425,11 @@ namespace SimpleEngine {
                 ImGui::TreePop();
             }
         }
-        else
+        else//结点是文件
         {
             ImGui::TreeNodeEx(node->m_file_name.c_str(),
                 ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen |
-                ImGuiTreeNodeFlags_SpanFullWidth);
+                ImGuiTreeNodeFlags_SpanFullWidth);//结点不可展开
             if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
             {
                 onFileContentItemClicked(node);

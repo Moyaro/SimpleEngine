@@ -82,12 +82,12 @@ namespace SimpleEngine
     void Matrix4x4::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Ordering:
-        //    1. Scale
+        //    1. Scale：可看作对角阵
         //    2. Rotate
         //    3. Translate
 
         Matrix3x3 rot3x3;
-        orientation.toRotationMatrix(rot3x3);
+        orientation.toRotationMatrix(rot3x3);//四元数转旋转矩阵
 
         // Set up final matrix with scale, rotation and translation
         m_mat[0][0] = scale.x * rot3x3[0][0];

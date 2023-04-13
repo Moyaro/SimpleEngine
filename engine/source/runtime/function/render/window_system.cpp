@@ -39,12 +39,12 @@ namespace SimpleEngine {
 		glfwSetWindowSizeCallback(m_window, windowSizeCallback);
 		glfwSetWindowCloseCallback(m_window, windowCloseCallback);
 
-		glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
+		glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);//禁用原始鼠标移动
 	}
 
 	void WindowSystem::setFocusMode(bool mode)
 	{
 		m_is_focus_mode = mode;
-		glfwSetInputMode(m_window, GLFW_CURSOR, m_is_focus_mode ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(m_window, GLFW_CURSOR, m_is_focus_mode ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);//焦点模式下鼠标被隐藏、抓取
 	}
 }

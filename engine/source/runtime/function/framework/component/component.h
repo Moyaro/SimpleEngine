@@ -18,7 +18,7 @@ namespace SimpleEngine
         Component() = default;
         virtual ~Component() {}
 
-        // Instantiating the component after definition loaded
+        //物体实例化：资源加载后设置进属性
         virtual void postLoadResource(std::weak_ptr<GObject> parent_object) { m_parent_object = parent_object; }
 
         virtual void tick(float delta_time) {};

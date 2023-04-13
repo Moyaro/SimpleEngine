@@ -10,18 +10,18 @@ namespace SimpleEngine
     class Level;
     class LevelDebugger;
 
-    /// Manage all game worlds, it should be support multiple worlds, including game world and editor world.
-    /// Currently, the implement just supports one active world and one active level
+    /// 管理世界：编辑/游戏世界
+    /// 目前仅能管理一个世界和关卡
     class WorldManager
     {
     public:
         virtual ~WorldManager();
+        void clear();//清理所有关卡、世界，并把世界加载状态设置为false
 
-        void init();
-        void clear();
-
+        void init();//设置世界加载状态，url，level_debugger
+        
         void reloadCurrentLevel();
-        void saveCurrentLevel();
+        void saveCurrentLevel();//调用level的函数保存关卡
 
         void                 tick(float delta_time);
         std::weak_ptr<Level> getCurrentActiveLevel() const { return m_current_active_level; }
@@ -34,7 +34,7 @@ namespace SimpleEngine
         std::string               m_current_world_url;
         std::shared_ptr<WorldRes> m_current_world_resource;
 
-        //key: level url, vaule: level instance
+        //key: 关卡地址, vaule: 关卡实例
         std::unordered_map<std::string, std::shared_ptr<Level>> m_loaded_levels;
 
         //激活的关卡，目前只支持一个

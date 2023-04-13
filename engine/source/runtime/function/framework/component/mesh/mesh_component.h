@@ -19,14 +19,15 @@ namespace SimpleEngine
     public:
         MeshComponent() {};
 
-        void postLoadResource(std::weak_ptr<GObject> parent_object) override;
+        void postLoadResource(std::weak_ptr<GObject> parent_object) override;//设置父物体，遍历所有网格资源,从中获取信息后放入网格描述信息里
+
         const std::vector<GameObjectPartDesc>& getRawMeshes() const { return m_raw_meshes; }
 
         void tick(float delta_time) override;
 
     private:
         META(Enable)
-            MeshComponentRes m_mesh_res;//网格资源
-        std::vector<GameObjectPartDesc> m_raw_meshes;//原始网格
+            MeshComponentRes m_mesh_res;//网格组件资源：子网格vector
+        std::vector<GameObjectPartDesc> m_raw_meshes;//一堆网格组件信息
     };
 }

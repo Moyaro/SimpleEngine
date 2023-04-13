@@ -23,7 +23,7 @@ namespace SimpleEngine {
 	{
 	public:
 		~WindowSystem();//删窗口，停glfw
-		void init(WindowCreateInfo& create_info);//glfw初始化，窗口初始化，创建窗口
+		void init(WindowCreateInfo& create_info);//glfw初始化，创建窗口，设置回调
 
 		//窗口控制
 		void setTitle(const char* title) { glfwSetWindowTitle(m_window, title); }
@@ -47,7 +47,7 @@ namespace SimpleEngine {
         typedef std::function<void(int, int)>           onWindowSizeFunc;
         typedef std::function<void()>                   onWindowCloseFunc;
 
-        //注册回调函数
+        //注册回调函数进vector
         void registerOnResetFunc(onResetFunc func) { m_onResetFunc.push_back(func); }
         void registerOnKeyFunc(onKeyFunc func) { m_onKeyFunc.push_back(func); }
         void registerOnCharFunc(onCharFunc func) { m_onCharFunc.push_back(func); }
@@ -68,11 +68,13 @@ namespace SimpleEngine {
             }
             return glfwGetMouseButton(m_window, button) == GLFW_PRESS;
         }
+
+        //焦点模式
         bool getFocusMode() const { return m_is_focus_mode; }
         void setFocusMode(bool mode);
 
     protected:
-        // 窗口事件回调函数的定义
+        // 窗口事件回调函数的定义：获取window，调用对应函数
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
         {
             WindowSystem* app = (WindowSystem*)glfwGetWindowUserPointer(window);
@@ -148,6 +150,7 @@ namespace SimpleEngine {
         }
         static void windowCloseCallback(GLFWwindow* window) { glfwSetWindowShouldClose(window, true); }
 
+        //调用数组中的函数
         void onReset()
         {
             for (auto& func : m_onResetFunc)

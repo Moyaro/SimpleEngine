@@ -18,13 +18,13 @@ namespace SimpleEngine
         invalid  = (unsigned int)(1 << 31) // lost focus
     };
 
-    extern unsigned int k_complement_control_command;
+    extern unsigned int k_complement_control_command;//完成的命令
 
     class InputSystem
     {
 
     public:
-        void onKey(int key, int scancode, int action, int mods);
+        void onKey(int key, int scancode, int action, int mods);//键盘命令
         void onCursorPos(double current_cursor_x, double current_cursor_y);
 
         void init();
@@ -37,6 +37,7 @@ namespace SimpleEngine
         Radian m_cursor_delta_yaw {0};
         Radian m_cursor_delta_pitch {0};
 
+        //获取按键命令
         void         resetGameCommand() { m_game_command = 0; }
         unsigned int getGameCommand() const { return m_game_command; }
 

@@ -23,11 +23,10 @@ namespace SimpleEngine
         Quaternion getRotation() const { return m_transform_buffer[m_current_index].m_rotation; }
 
         void setPosition(const Vector3& new_translation);
-
         void setScale(const Vector3& new_scale);
-
         void setRotation(const Quaternion& new_rotation);
 
+        //获取当前变换矩阵
         const Transform& getTransformConst() const { return m_transform_buffer[m_current_index]; }
         Transform&       getTransform() { return m_transform_buffer[m_next_index]; }
 

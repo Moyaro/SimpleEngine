@@ -72,7 +72,7 @@ namespace SimpleEngine {
         m_invRotation = m_rotation.conjugate();
     }
 
-    //*************************************Motor模式用**************************************************//
+    //*************************************移动**************************************************//
     void RenderCamera::rotate(Vector2 delta)
     {
         // rotation around x, y axis

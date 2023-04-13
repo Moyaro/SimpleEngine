@@ -7,6 +7,9 @@
 
 namespace SimpleEngine {
 
+    ///
+    /// 网格/材质/变换的描述信息
+    /// 
     //网格
     REFLECTION_TYPE(GameObjectMeshDesc)
         STRUCT(GameObjectMeshDesc, Fields)
@@ -14,7 +17,6 @@ namespace SimpleEngine {
         REFLECTION_BODY(GameObjectMeshDesc)
             std::string m_mesh_file;
     };
-
     //材质
     REFLECTION_TYPE(GameObjectMaterialDesc)
         STRUCT(GameObjectMaterialDesc, Fields)
@@ -27,8 +29,7 @@ namespace SimpleEngine {
         std::string m_emissive_texture_file;
         bool m_with_texture{ false };
     };
-
-    //移动
+    //变换
     REFLECTION_TYPE(GameObjectTransformDesc)
         STRUCT(GameObjectTransformDesc, WhiteListFields)
     {
@@ -38,7 +39,7 @@ namespace SimpleEngine {
         };
     };
 
-    //物体信息
+    //物体组件的描述信息
     REFLECTION_TYPE(GameObjectPartDesc)
         STRUCT(GameObjectPartDesc, Fields)
     {
@@ -62,7 +63,7 @@ namespace SimpleEngine {
         bool   isValid() const { return m_go_id != k_invalid_gobject_id && m_part_id != k_invalid_part_id; }
     };
 
-    //物体
+    //物体描述信息：go_id+组件vector
     class GameObjectDesc
     {
     public:

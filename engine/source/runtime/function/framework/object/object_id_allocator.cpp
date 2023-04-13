@@ -11,7 +11,7 @@ namespace SimpleEngine
         m_next_id++;
         if (m_next_id > k_invalid_gobject_id)
         {
-            std::runtime_error("id分配超过上限！");
+            throw std::runtime_error("id分配超过上限！");
         }
 
         return new_object_id;

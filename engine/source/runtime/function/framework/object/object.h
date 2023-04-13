@@ -19,10 +19,11 @@ namespace SimpleEngine
     {
     public:
         GObject(GObjectID id) : m_id{ id } {}
-        virtual ~GObject();
+        virtual ~GObject();//删反射指针
 
-        virtual void tick(float delta_time);
+        virtual void tick(float delta_time);//检查组件是否需要tick
 
+        //读取/保存至res
         bool load(const ObjectInstanceRes& object_instance_res);
         void save(ObjectInstanceRes& out_object_instance_res);
 
@@ -32,11 +33,10 @@ namespace SimpleEngine
         void  setName(std::string name) { m_name = name; }
         const std::string& getName() const { return m_name; }
 
-        bool hasComponent(const std::string& compenent_type_name) const;
+        bool hasComponent(const std::string& compenent_type_name) const;//根据类型名检查是否有组件
+        std::vector<Reflection::ReflectionPtr<Component>> getComponents() { return m_components; }//获取组件
 
-        //获取组件
-        std::vector<Reflection::ReflectionPtr<Component>> getComponents() { return m_components; }
-
+        //根据类型名获取组件
         template<typename TComponent>
         TComponent* tryGetComponent(const std::string& compenent_type_name)
         {
@@ -50,7 +50,6 @@ namespace SimpleEngine
 
             return nullptr;
         }
-
         template<typename TComponent>
         const TComponent* tryGetComponentConst(const std::string& compenent_type_name) const
         {
@@ -63,7 +62,7 @@ namespace SimpleEngine
             }
             return nullptr;
         }
-
+        //调用获取组件的方法
 #define tryGetComponent(COMPONENT_TYPE) tryGetComponent<COMPONENT_TYPE>(#COMPONENT_TYPE)
 #define tryGetComponentConst(COMPONENT_TYPE) tryGetComponentConst<const COMPONENT_TYPE>(#COMPONENT_TYPE)
 
@@ -72,7 +71,7 @@ namespace SimpleEngine
         std::string m_name;
         std::string m_definition_url;
 
-        // we have to use the ReflectionPtr due to that the components need to be reflected 
+        //用ReflectionPtr的原因是组件需要反射
         // in editor, and it's polymorphism
         std::vector<Reflection::ReflectionPtr<Component>> m_components;
     };

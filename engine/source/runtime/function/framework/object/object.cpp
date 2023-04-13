@@ -17,17 +17,6 @@
 
 namespace SimpleEngine
 {
-    bool shouldComponentTick(std::string component_type_name)
-    {
-        if (g_is_editor_mode)
-        {
-            return g_editor_tick_component_types.find(component_type_name) != g_editor_tick_component_types.end();
-        }
-        else
-        {
-            return true;
-        }
-    }
 
     GObject::~GObject()
     {
@@ -38,9 +27,20 @@ namespace SimpleEngine
         m_components.clear();
     }
 
+    bool shouldComponentTick(std::string component_type_name)
+    {
+        if (g_is_editor_mode)//检查编辑模式该组件类型是否需要tick
+        {
+            return g_editor_tick_component_types.find(component_type_name) != g_editor_tick_component_types.end();
+        }
+        else
+        {
+            return true;
+        }
+    }
     void GObject::tick(float delta_time)
     {
-        for (auto& component : m_components)
+        for (auto& component : m_components)//检查组件是否需要tick
         {
             if (shouldComponentTick(component.getTypeName()))
             {
@@ -62,13 +62,13 @@ namespace SimpleEngine
 
     bool GObject::load(const ObjectInstanceRes& object_instance_res)
     {
-        // clear old components
+        //清理旧组件
         m_components.clear();
 
-        setName(object_instance_res.m_name);
+        setName(object_instance_res.m_name);//设置名称
 
-        // load object instanced components
-        m_components = object_instance_res.m_instanced_components;
+        //从资源中获取内容
+        m_components = object_instance_res.m_instanced_components;//获取已实例化的组件
         for (auto component : m_components)
         {
             if (component)
@@ -77,11 +77,9 @@ namespace SimpleEngine
             }
         }
 
-        // load object definition components
+        //读取物体定义资源
         m_definition_url = object_instance_res.m_definition;
-
         ObjectDefinitionRes definition_res;
-
         const bool is_loaded_success = g_runtime_global_context.m_asset_manager->loadAsset(m_definition_url, definition_res);
         if (!is_loaded_success)
             return false;
@@ -89,12 +87,13 @@ namespace SimpleEngine
         for (auto loaded_component : definition_res.m_components)
         {
             const std::string type_name = loaded_component.getTypeName();
-            // don't create component if it has been instanced
+
+            //如果已实例化就跳过
             if (hasComponent(type_name))
                 continue;
 
+            //未实例化就加载资源、放入m_components中
             loaded_component->postLoadResource(weak_from_this());
-
             m_components.push_back(loaded_component);
         }
 
@@ -105,7 +104,6 @@ namespace SimpleEngine
     {
         out_object_instance_res.m_name = m_name;
         out_object_instance_res.m_definition = m_definition_url;
-
         out_object_instance_res.m_instanced_components = m_components;
     }
 
