@@ -30,27 +30,30 @@ namespace SimpleEngine
         void init() { registerInput(); }
         void tick(float delta_time) { processEditorCommand(); }
 
-    public:
-        void registerInput();
-        void updateCursorOnAxis(Vector2 cursor_uv);
-        void processEditorCommand();
-        void onKeyInEditorMode(int key, int scancode, int action, int mods);
+        void registerInput();//注册回调事件
+        void updateCursorOnAxis(Vector2 cursor_uv);//更新轴模式
+        void processEditorCommand();//执行命令
+        void onKeyInEditorMode(int key, int scancode, int action, int mods);//编辑模式下键盘点击事件
 
-        void onKey(int key, int scancode, int action, int mods);
+        //输入回调事件
+        void onKey(int key, int scancode, int action, int mods);//键盘事件
         void onReset();
         void onCursorPos(double xpos, double ypos);
-        void onCursorEnter(int entered);
-        void onScroll(double xoffset, double yoffset);
-        void onMouseButtonClicked(int key, int action);
-        void onWindowClosed();
+        void onCursorEnter(int entered);//未进入窗口内时，鼠标坐标为(-1,-1)
+        void onScroll(double xoffset, double yoffset);//滚轮事件：+右键=加速/减速，不加=缩放相机视角
+        void onMouseButtonClicked(int key, int action);//鼠标点击事件：用pick_pass获取mesh_id，从而实现点击对应物体
+        void onWindowClosed();//窗口关闭事件：关闭引擎
 
+        //鼠标是否在矩形区域内，实现按钮功能
         bool isCursorInRect(Vector2 pos, Vector2 size) const{ return pos.x <= m_mouse_x && m_mouse_x <= pos.x + size.x && pos.y <= m_mouse_y && m_mouse_y <= pos.y + size.y; }
 
     public:
+        //获取窗口位置、大小，相机速度
         Vector2 getEngineWindowPos() const { return m_engine_window_pos; };
         Vector2 getEngineWindowSize() const { return m_engine_window_size; };
         float   getCameraSpeed() const { return m_camera_speed; };
 
+        //设置窗口位置、大小，重置命令
         void setEngineWindowPos(Vector2 new_window_pos) { m_engine_window_pos = new_window_pos; };
         void setEngineWindowSize(Vector2 new_window_size) { m_engine_window_size = new_window_size; };
         void resetEditorCommand() { m_editor_command = 0; }

@@ -39,9 +39,10 @@ namespace SimpleEngine{
     {
         float           camera_speed  = m_camera_speed;
         std::shared_ptr editor_camera = g_editor_global_context.m_scene_manager->getEditorCamera();
-        Quaternion      camera_rotate = editor_camera->rotation().inverse();
-        Vector3         camera_relative_pos(0, 0, 0);
+        Quaternion      camera_rotate = editor_camera->rotation().inverse();//相机旋转的逆
+        Vector3         camera_relative_pos(0, 0, 0);//相机相对位置
 
+        //检查当前需要执行的命令
         if ((unsigned int)EditorCommand::camera_foward & m_editor_command)
         {
             camera_relative_pos += camera_rotate * Vector3 {0, camera_speed, 0};
@@ -78,6 +79,7 @@ namespace SimpleEngine{
     {
         if (action == GLFW_PRESS)
         {
+            //按钮按下，为对应按键设置命令
             switch (key)
             {
                 case GLFW_KEY_A:
@@ -116,6 +118,7 @@ namespace SimpleEngine{
         }
         else if (action == GLFW_RELEASE)
         {
+            //按钮释放，为对应按键释放命令
             switch (key)
             {
                 case GLFW_KEY_ESCAPE:
@@ -175,18 +178,15 @@ namespace SimpleEngine{
         if (!g_is_editor_mode)
             return;
 
-        float angularVelocity =
-            180.0f / Math::max(m_engine_window_size.x, m_engine_window_size.y); // 180 degrees while moving full screen
-        if (m_mouse_x >= 0.0f && m_mouse_y >= 0.0f)
+        float angularVelocity = 180.0f / Math::max(m_engine_window_size.x, m_engine_window_size.y); //角速度：保持鼠标在不同分辨率和屏幕尺寸下的旋转速度一致
+        if (m_mouse_x >= 0.0f && m_mouse_y >= 0.0f)//如果之前光标在窗口内
         {
-            if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
+            if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))//点击鼠标右键移动，禁用鼠标，相机旋转
             {
-                glfwSetInputMode(
-                    g_editor_global_context.m_window_system->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                g_editor_global_context.m_scene_manager->getEditorCamera()->rotate(
-                    Vector2(ypos - m_mouse_y, xpos - m_mouse_x) * angularVelocity);
+                glfwSetInputMode(g_editor_global_context.m_window_system->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                g_editor_global_context.m_scene_manager->getEditorCamera()->rotate(Vector2(ypos - m_mouse_y, xpos - m_mouse_x) * angularVelocity);
             }
-            else if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
+            else if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))//点击鼠标左键移动，移动物体，设置鼠标模式为normal
             {
                 g_editor_global_context.m_scene_manager->moveEntity(
                     xpos,
@@ -199,7 +199,7 @@ namespace SimpleEngine{
                     g_editor_global_context.m_scene_manager->getSelectedObjectMatrix());
                 glfwSetInputMode(g_editor_global_context.m_window_system->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             }
-            else
+            else//未点任何按键，设置光标模式为normal，当前光标在窗口内时设置光标的uv坐标，更新鼠标位置
             {
                 glfwSetInputMode(g_editor_global_context.m_window_system->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
@@ -211,13 +211,14 @@ namespace SimpleEngine{
                 }
             }
         }
+        //保存新鼠标位置
         m_mouse_x = xpos;
         m_mouse_y = ypos;
     }
 
     void EditorInputManager::onCursorEnter(int entered)
     {
-        if (!entered) // lost focus
+        if (!entered) //失去焦点
         {
             m_mouse_x = m_mouse_y = -1.0f;
         }
@@ -230,23 +231,23 @@ namespace SimpleEngine{
             return;
         }
 
+        //鼠标在窗口内，
         if (isCursorInRect(m_engine_window_pos, m_engine_window_size))
         {
-            if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))
+            if (g_editor_global_context.m_window_system->isMouseButtonDown(GLFW_MOUSE_BUTTON_RIGHT))//点击鼠标右键
             {
-                if (yoffset > 0)
+                if (yoffset > 0)//滚轮上移，加速
                 {
                     m_camera_speed *= 1.2f;
                 }
-                else
+                else//滚轮下移，减速
                 {
                     m_camera_speed *= 0.8f;
                 }
             }
-            else
+            else//没按右键，缩放相机视角
             {
-                g_editor_global_context.m_scene_manager->getEditorCamera()->zoom(
-                    (float)yoffset * 2.0f); // wheel scrolled up = zoom in by 2 extra degrees
+                g_editor_global_context.m_scene_manager->getEditorCamera()->zoom((float)yoffset * 2.0f);
             }
         }
     }
@@ -258,20 +259,23 @@ namespace SimpleEngine{
         if (m_cursor_on_axis != 3)
             return;
 
+        //获取当前level
         std::shared_ptr<Level> current_active_level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
         if (current_active_level == nullptr)
             return;
 
+        //鼠标在窗口内
         if (isCursorInRect(m_engine_window_pos, m_engine_window_size))
         {
-            if (key == GLFW_MOUSE_BUTTON_LEFT)
+            if (key == GLFW_MOUSE_BUTTON_LEFT)//点击左键
             {
+                //通过picked_uv获取网格id
                 Vector2 picked_uv((m_mouse_x - m_engine_window_pos.x) / m_engine_window_size.x,
                                   (m_mouse_y - m_engine_window_pos.y) / m_engine_window_size.y);
                 size_t  select_mesh_id = g_editor_global_context.m_scene_manager->getGuidOfPickedMesh(picked_uv);
 
-                size_t gobject_id = g_editor_global_context.m_render_system->getGObjectIDByMeshID(select_mesh_id);
-                g_editor_global_context.m_scene_manager->onGObjectSelected(gobject_id);
+                size_t gobject_id = g_editor_global_context.m_render_system->getGObjectIDByMeshID(select_mesh_id);//获取guid
+                g_editor_global_context.m_scene_manager->onGObjectSelected(gobject_id);//进行物体点击事件
             }
         }
     }

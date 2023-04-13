@@ -250,7 +250,7 @@ namespace SimpleEngine {
             while (!swap_data.m_game_object_to_delete->isEmpty())
             {
                 GameObjectDesc gobject = swap_data.m_game_object_to_delete->getNextProcessObject();
-                //m_render_scene->deleteEntityByGObjectID(gobject.getId());
+                m_render_scene->deleteEntityByGObjectID(gobject.getId());
                 swap_data.m_game_object_to_delete->pop();
             }
 

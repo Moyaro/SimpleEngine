@@ -62,11 +62,12 @@ namespace SimpleEngine {
 
         bool isMouseButtonDown(int button) const
         {
+            //检查button是否有效
             if (button < GLFW_MOUSE_BUTTON_1 || button > GLFW_MOUSE_BUTTON_LAST)
             {
                 return false;
             }
-            return glfwGetMouseButton(m_window, button) == GLFW_PRESS;
+            return glfwGetMouseButton(m_window, button) == GLFW_PRESS;//获取按键状态
         }
 
         //焦点模式

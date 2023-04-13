@@ -600,15 +600,15 @@ namespace SimpleEngine {
 
         ImGui::DockSpace(main_docking_id);
 
-        if (ImGui::BeginMenuBar())
+        if (ImGui::BeginMenuBar())//菜单栏
         {
             if (ImGui::BeginMenu("Menu"))
             {
                 if (ImGui::MenuItem("Reload Current Level"))
                 {
-                    g_runtime_global_context.m_world_manager->reloadCurrentLevel();
-                    g_runtime_global_context.m_render_system->clearForLevelReloading();
-                    g_editor_global_context.m_scene_manager->onGObjectSelected(k_invalid_gobject_id);
+                    g_runtime_global_context.m_world_manager->reloadCurrentLevel();//重载关卡
+                    g_runtime_global_context.m_render_system->clearForLevelReloading();//清理id,渲染实体
+                    g_editor_global_context.m_scene_manager->onGObjectSelected(k_invalid_gobject_id);//设置未没有物体被未选中状态
                 }
                 if (ImGui::MenuItem("Save Current Level"))
                 {
@@ -634,14 +634,14 @@ namespace SimpleEngine {
                     }
                     ImGui::EndMenu();
                 }
-                if (ImGui::MenuItem("Exit"))
+                if (ImGui::MenuItem("Exit"))//关闭引擎
                 {
                     g_editor_global_context.m_engine_runtime->closeEngine();
                     exit(0);
                 }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Window"))
+            if (ImGui::BeginMenu("Window"))//控制窗口显示
             {
                 ImGui::MenuItem("World Objects", nullptr, &m_asset_window_open);
                 ImGui::MenuItem("Game", nullptr, &m_game_engine_window_open);
@@ -771,15 +771,15 @@ namespace SimpleEngine {
             ImGui::TableHeadersRow();
 
             auto current_time = std::chrono::steady_clock::now();
-            if (current_time - m_last_file_tree_update > std::chrono::seconds(1))
+            if (current_time - m_last_file_tree_update > std::chrono::seconds(1))//当前时间应该与上次更新的时间差>1秒
             {
                 m_editor_file_service.buildEngineFileTree();
                 m_last_file_tree_update = current_time;
             }
             m_last_file_tree_update = current_time;
 
-            EditorFileNode* editor_root_node = m_editor_file_service.getEditorRootNode();
-            buildEditorFileAssetsUITree(editor_root_node);
+            EditorFileNode* editor_root_node = m_editor_file_service.getEditorRootNode();//获取根结点
+            buildEditorFileAssetsUITree(editor_root_node);//建立UI树
             ImGui::EndTable();
         }
 

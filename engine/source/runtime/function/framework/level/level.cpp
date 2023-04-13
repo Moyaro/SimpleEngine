@@ -16,11 +16,18 @@ namespace SimpleEngine
         m_gobjects.clear();
     }
 
+     void Level::unload()
+    {
+        clear();
+        LOG_INFO("unload level: {}", m_level_res_url);
+     }
+
     GObjectID Level::createObject(const ObjectInstanceRes& object_instance_res)
     {
         GObjectID object_id = ObjectIDAllocator::alloc();
         assert(object_id != k_invalid_gobject_id);
 
+        //创建GO指针
         std::shared_ptr<GObject> gobject;
         try
         {
@@ -28,9 +35,10 @@ namespace SimpleEngine
         }
         catch (const std::bad_alloc&)
         {
-            LOG_FATAL("cannot allocate memory for new gobject");
+            LOG_FATAL("无法为新物体分配内存！");
         }
 
+        //读取物体资源，成功就放到关卡物体map里
         bool is_loaded = gobject->load(object_instance_res);
         if (is_loaded)
         {
@@ -49,19 +57,21 @@ namespace SimpleEngine
     {
         LOG_INFO("loading level: {}", level_res_url);
 
+        //读level资源
         m_level_res_url = level_res_url;
-
-        LevelRes   level_res;
+        LevelRes level_res;
         const bool is_load_success = g_runtime_global_context.m_asset_manager->loadAsset(level_res_url, level_res);
         if (is_load_success == false)
         {
             return false;
         }
+        //创建关卡内的物体
         for (const ObjectInstanceRes& object_instance_res : level_res.m_objects)
         {
             createObject(object_instance_res);
         }
 
+        //设置主相机
         for (const auto& object_pair : m_gobjects)
         {
             std::shared_ptr<GObject> object = object_pair.second;
@@ -76,16 +86,9 @@ namespace SimpleEngine
         }
 
         m_is_loaded = true;
-
         LOG_INFO("level load succeed");
 
         return true;
-    }
-
-    void Level::unload()
-    {
-        clear();
-        LOG_INFO("unload level: {}", m_level_res_url);
     }
 
     bool Level::save()
@@ -93,10 +96,12 @@ namespace SimpleEngine
         LOG_INFO("saving level: {}", m_level_res_url);
         LevelRes output_level_res;
 
-        const size_t                    object_cout = m_gobjects.size();
+        //设置输出的物体数组
+        const size_t object_cout = m_gobjects.size();
         std::vector<ObjectInstanceRes>& output_objects = output_level_res.m_objects;
         output_objects.resize(object_cout);
 
+        //把属性保存到要输出的物体数组中
         size_t object_index = 0;
         for (const auto& id_object_pair : m_gobjects)
         {
@@ -107,9 +112,7 @@ namespace SimpleEngine
             }
         }
 
-        const bool is_save_success =
-            g_runtime_global_context.m_asset_manager->saveAsset(output_level_res, m_level_res_url);
-
+        const bool is_save_success = g_runtime_global_context.m_asset_manager->saveAsset(output_level_res, m_level_res_url);
         if (is_save_success == false)
         {
             LOG_ERROR("failed to save {}", m_level_res_url);
@@ -129,6 +132,7 @@ namespace SimpleEngine
             return;
         }
 
+        //每个物体进行tick
         for (const auto& id_object_pair : m_gobjects)
         {
             assert(id_object_pair.second);

@@ -45,7 +45,7 @@ namespace SimpleEngine {
 		std::unordered_map<std::string, std::function<void(std::string, void*)>> m_editor_ui_creator;
 		std::unordered_map<std::string, unsigned int> m_new_object_index_map;//物体索引
 		EditorFileService m_editor_file_service;
-		std::chrono::time_point<std::chrono::steady_clock> m_last_file_tree_update;
+		std::chrono::time_point<std::chrono::steady_clock> m_last_file_tree_update;//文件树的最后更新时间
 
 		//GUI开关
 		bool m_editor_menu_window_open = true;

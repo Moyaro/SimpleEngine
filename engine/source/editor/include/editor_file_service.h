@@ -24,6 +24,9 @@ namespace SimpleEngine
         {}
     };
 
+    /// <summary>
+    /// 用于File Content界面
+    /// </summary>
     class EditorFileService
     {
         EditorFileNodeArray m_file_node_array;//文件结点数组

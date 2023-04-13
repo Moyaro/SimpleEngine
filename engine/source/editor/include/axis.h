@@ -6,7 +6,7 @@
 namespace SimpleEngine
 {
     /// <summary>
-    /// 移动/旋转/缩放
+    /// 移动/旋转/缩放的轴实体
     /// </summary>
  
     class EditorTranslationAxis : public RenderEntity

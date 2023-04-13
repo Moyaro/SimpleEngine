@@ -142,15 +142,12 @@ namespace SimpleEngine
 
     EditorFileNode* EditorFileService::getParentNodePtr(EditorFileNode* file_node)
     {
-        //遍历结点数组，找到名称和深度相同的结点，返回
         int editor_node_count = m_file_node_array.size();
         for (int file_node_index = 0; file_node_index < editor_node_count; file_node_index++)
         {
             if (m_file_node_array[file_node_index]->m_file_name == file_node->m_file_name &&
                 m_file_node_array[file_node_index]->m_node_depth == file_node->m_node_depth)
             {
-                LOG_INFO("子结点：" + file_node->m_file_name + ";父结点：" +
-                         m_file_node_array[file_node_index].get()->m_file_name);
                 return m_file_node_array[file_node_index].get();
             }
         }

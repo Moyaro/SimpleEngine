@@ -117,7 +117,7 @@ namespace SimpleEngine {
     void RenderPipeline::setAxisVisibleState(bool state)
     {
         MainCameraPass& main_camera_pass = *(static_cast<MainCameraPass*>(m_main_camera_pass.get()));
-        main_camera_pass.m_is_show_axis = state;
+        main_camera_pass.m_is_show_axis = state;//轴可见/不可见
     }
 
     void RenderPipeline::setSelectedAxis(size_t selected_axis)

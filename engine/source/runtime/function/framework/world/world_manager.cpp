@@ -108,6 +108,7 @@ namespace SimpleEngine
 
     void WorldManager::reloadCurrentLevel()
     {
+        //获取当前关卡
         auto active_level = m_current_active_level.lock();
         if (active_level == nullptr)
         {
@@ -115,6 +116,7 @@ namespace SimpleEngine
             return;
         }
 
+        //重新加载关卡地址
         const std::string level_url = active_level->getLevelResUrl();
         active_level->unload();
         m_loaded_levels.erase(level_url);
@@ -126,7 +128,7 @@ namespace SimpleEngine
             return;
         }
 
-        // update the active level instance
+        //找到加载的关卡，设置为激活的关卡
         auto iter = m_loaded_levels.find(level_url);
         assert(iter != m_loaded_levels.end());
 

@@ -31,11 +31,14 @@ namespace SimpleEngine
         size_t   updateCursorOnAxis(
             Vector2 cursor_uv,
             Vector2 game_engine_window_size);
-        void drawSelectedEntityAxis();
-        std::weak_ptr<GObject> getSelectedGObject() const;
-        RenderEntity* getAxisMeshByType(EditorAxisMode axis_mode);
-        void onGObjectSelected(GObjectID selected_gobject_id);
-        void onDeleteSelectedGObject();
+        void drawSelectedEntityAxis();//绘制对应模式的轴
+        std::weak_ptr<GObject> getSelectedGObject() const;//用id获取选中的物体
+        RenderEntity* getAxisMeshByType(EditorAxisMode axis_mode);//获取对应类型的轴网格
+
+        void onGObjectSelected(GObjectID selected_gobject_id);//物体被选中的事件
+        void onDeleteSelectedGObject();//删除选中物体的事件
+
+        //移动物体
         void moveEntity(float     new_mouse_pos_x,
             float     new_mouse_pos_y,
             float     last_mouse_pos_x,
@@ -60,17 +63,19 @@ namespace SimpleEngine
         void setSelectedObjectMatrix(Matrix4x4 new_object_matrix) { m_selected_object_matrix = new_object_matrix; }
         void setEditorAxisMode(EditorAxisMode new_axis_mode) { m_axis_mode = new_axis_mode; }
     private:
+        //轴
         EditorTranslationAxis m_translation_axis;
         EditorRotationAxis    m_rotation_axis;
         EditorScaleAxis       m_scale_aixs;
 
+        //选中的物体的id、transform矩阵
         GObjectID m_selected_gobject_id{ k_invalid_gobject_id };
         Matrix4x4 m_selected_object_matrix{ Matrix4x4::IDENTITY };
 
-        EditorAxisMode m_axis_mode{ EditorAxisMode::TranslateMode };
-        std::shared_ptr<RenderCamera> m_camera;
+        EditorAxisMode m_axis_mode{ EditorAxisMode::TranslateMode };//当前轴模式
+        std::shared_ptr<RenderCamera> m_camera;//相机
 
-        size_t m_selected_axis{ 3 };
+        size_t m_selected_axis{ 3 };//选择的轴
 
         bool   m_is_show_axis = true;
     };

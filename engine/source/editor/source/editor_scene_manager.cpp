@@ -30,8 +30,9 @@ namespace SimpleEngine
         }
     }
 
-    float intersectPlaneRay(Vector3 normal, float d, Vector3 origin, Vector3 dir)
+    float intersectPlaneRay(Vector3 normal, float d, Vector3 origin, Vector3 dir)//法线，距离，射线起点、方向
     {
+        //normal·(origin + t * dir) + d = 0，计算射线与平面的交点t
         float deno = normal.dotProduct(dir);
         if (fabs(deno) < 0.0001)
         {
@@ -43,18 +44,20 @@ namespace SimpleEngine
 
     size_t EditorSceneManager::updateCursorOnAxis(Vector2 cursor_uv, Vector2 game_engine_window_size)
     {
-
+        //获取相机参数
         float   camera_fov     = m_camera->getFovYDeprecated();
         Vector3 camera_forward = m_camera->forward();
-
         Vector3 camera_up       = m_camera->up();
         Vector3 camera_right    = m_camera->right();
         Vector3 camera_position = m_camera->position();
 
+        //没有选中物体，则默认轴模式
         if (m_selected_gobject_id == k_invalid_gobject_id)
         {
             return m_selected_axis;
         }
+
+        //选中物体，就获取轴模式的实体
         RenderEntity* selected_aixs = getAxisMeshByType(m_axis_mode);
         m_selected_axis             = 3;
         if (m_is_show_axis == false)
@@ -63,20 +66,22 @@ namespace SimpleEngine
         }
         else
         {
+            //轴模型矩阵
             Matrix4x4 model_matrix = selected_aixs->m_model_matrix;
             Vector3 model_scale;
             Quaternion model_rotation;
             Vector3 model_translation;
             model_matrix.decomposition(model_translation, model_scale, model_rotation);
-            float     window_forward   = game_engine_window_size.y / 2.0f / Math::tan(Math::degreesToRadians(camera_fov) / 2.0f);
+
+
+            float window_forward   = game_engine_window_size.y / 2.0f / Math::tan(Math::degreesToRadians(camera_fov) / 2.0f);//窗口到相机的距离
             Vector2 screen_center_uv = Vector2(cursor_uv.x, 1 - cursor_uv.y) - Vector2(0.5, 0.5);
             Vector3 world_ray_dir =
                 camera_forward * window_forward +
                 camera_right * (float)game_engine_window_size.x * screen_center_uv.x +
-                camera_up * (float)game_engine_window_size.y * screen_center_uv.y;
+                camera_up * (float)game_engine_window_size.y * screen_center_uv.y;//获取射线方向
 
-            Vector4 local_ray_origin =
-                model_matrix.inverse() * Vector4(camera_position, 1.0f);
+            Vector4 local_ray_origin = model_matrix.inverse() * Vector4(camera_position, 1.0f);
             Vector3 local_ray_origin_xyz = Vector3(local_ray_origin.x, local_ray_origin.y, local_ray_origin.z);
             Quaternion inversed_rotation = model_rotation.inverse();
             inversed_rotation.normalise();
@@ -159,13 +164,13 @@ namespace SimpleEngine
             }
             else if ((int)m_axis_mode == 1) // rotation axis
             {
-                const float DIST_THRESHOLD = 0.2f;
+                const float DIST_THRESHOLD = 0.2f;//距离阈值：所有距离必须在此范围内
 
+                //选择距离最小的做轴模式
                 float min_dist = 1e10f;
                 for (int i = 0; i < 3; ++i)
                 {
-                    const float dist =
-                        std::fabs(1 - std::hypot(intersect_pt[i].x, intersect_pt[i].y, intersect_pt[i].z));
+                    const float dist = std::fabs(1 - std::hypot(intersect_pt[i].x, intersect_pt[i].y, intersect_pt[i].z));
                     if ((dist < DIST_THRESHOLD) && (dist < min_dist))
                     {
                         min_dist        = dist;
@@ -208,28 +213,29 @@ namespace SimpleEngine
     {
         std::shared_ptr<GObject> selected_object = getSelectedGObject().lock();
 
-        if (g_is_editor_mode && selected_object != nullptr)
+        if (g_is_editor_mode && selected_object != nullptr)//编辑模式&&选中物体存在
         {
             const TransformComponent* transform_component = selected_object->tryGetComponentConst(TransformComponent);
 
             Vector3    scale;
             Quaternion rotation;
             Vector3    translation;
-            transform_component->getMatrix().decomposition(translation, scale, rotation);
+            transform_component->getMatrix().decomposition(translation, scale, rotation);//将矩阵分解为3个变量
+            //只保留物体的平移矩阵
             Matrix4x4     translation_matrix = Matrix4x4::getTrans(translation);
             Matrix4x4     scale_matrix       = Matrix4x4::buildScaleMatrix(1.0f, 1.0f, 1.0f);
             Matrix4x4     axis_model_matrix  = translation_matrix * scale_matrix;
-            RenderEntity* selected_aixs      = getAxisMeshByType(m_axis_mode);
+            RenderEntity* selected_aixs      = getAxisMeshByType(m_axis_mode);//选中的轴
             if (m_axis_mode == EditorAxisMode::TranslateMode || m_axis_mode == EditorAxisMode::RotateMode)
             {
                 selected_aixs->m_model_matrix = axis_model_matrix;
             }
-            else if (m_axis_mode == EditorAxisMode::ScaleMode)
+            else if (m_axis_mode == EditorAxisMode::ScaleMode)//沿着物体坐标系缩放
             {
                 selected_aixs->m_model_matrix = axis_model_matrix * Matrix4x4(rotation);
             }
 
-            g_editor_global_context.m_render_system->setVisibleAxis(*selected_aixs);
+            g_editor_global_context.m_render_system->setVisibleAxis(*selected_aixs);//设置轴可见，为场景设置当前轴
         }
         else
         {
@@ -253,19 +259,20 @@ namespace SimpleEngine
 
     void EditorSceneManager::onGObjectSelected(GObjectID selected_gobject_id)
     {
+        //选中的还是当前物体，直接返回
         if (selected_gobject_id == m_selected_gobject_id)
             return;
 
         m_selected_gobject_id = selected_gobject_id;
 
         std::shared_ptr<GObject> selected_gobject = getSelectedGObject().lock();
-        if (selected_gobject)
+        if (selected_gobject)//如果选中的物体存在，就保存它的变换矩阵
         {
             const TransformComponent* transform_component = selected_gobject->tryGetComponentConst(TransformComponent);
             m_selected_object_matrix                      = transform_component->getMatrix();
         }
 
-        drawSelectedEntityAxis();
+        drawSelectedEntityAxis();//绘制选中轴
 
         if (m_selected_gobject_id != k_invalid_gobject_id)
         {
@@ -279,21 +286,22 @@ namespace SimpleEngine
 
     void EditorSceneManager::onDeleteSelectedGObject()
     {
-        // delete selected entity
+        //删除选中的entity
         std::shared_ptr<GObject> selected_object = getSelectedGObject().lock();
-        if (selected_object != nullptr)
+        if (selected_object != nullptr)//选中物体不为空
         {
-            std::shared_ptr<Level> current_active_level =
-                g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
+            //获取目前关卡
+            std::shared_ptr<Level> current_active_level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
             if (current_active_level == nullptr)
                 return;
 
-            current_active_level->deleteGObjectByID(m_selected_gobject_id);
+            current_active_level->deleteGObjectByID(m_selected_gobject_id);//关卡中删除该物体
 
+            //增加要删除的物体
             RenderSwapContext& swap_context = g_editor_global_context.m_render_system->getSwapContext();
             swap_context.getLogicSwapData().addDeleteGameObject(GameObjectDesc {selected_object->getID(), {}});
         }
-        onGObjectSelected(k_invalid_gobject_id);
+        onGObjectSelected(k_invalid_gobject_id);//重新绘制轴
     }
 
     void EditorSceneManager::moveEntity(float     new_mouse_pos_x,
@@ -305,32 +313,36 @@ namespace SimpleEngine
                                         size_t    cursor_on_axis,
                                         Matrix4x4 model_matrix)
     {
+        //获取选中的物体
         std::shared_ptr<GObject> selected_object = getSelectedGObject().lock();
         if (selected_object == nullptr)
             return;
 
-        float angularVelocity =
-            18.0f / Math::max(engine_window_size.x, engine_window_size.y); // 18 degrees while moving full screen
+        float angularVelocity = 18.0f / Math::max(engine_window_size.x, engine_window_size.y); // 18 degrees while moving full screen
         Vector2 delta_mouse_move_uv = {(new_mouse_pos_x - last_mouse_pos_x), (new_mouse_pos_y - last_mouse_pos_y)};
 
+        //将模型矩阵分解成3变量
         Vector3    model_scale;
         Quaternion model_rotation;
         Vector3    model_translation;
         model_matrix.decomposition(model_translation, model_scale, model_rotation);
 
+        //轴的模型矩阵位置与物体模型矩阵相同
         Matrix4x4 axis_model_matrix = Matrix4x4::IDENTITY;
         axis_model_matrix.setTrans(model_translation);
 
+        //获取相机空间、投影矩阵
         Matrix4x4 view_matrix = m_camera->getLookAtMatrix();
         Matrix4x4 proj_matrix = m_camera->getPersProjMatrix();
 
-        Vector4 model_world_position_4(model_translation, 1.f);
+        Vector4 model_world_position_4(model_translation, 1.f);//物体的世界坐标
 
+        //获取裁剪坐标
         Vector4 model_origin_clip_position = proj_matrix * view_matrix * model_world_position_4;
         model_origin_clip_position /= model_origin_clip_position.w;
-        Vector2 model_origin_clip_uv =
-            Vector2((model_origin_clip_position.x + 1) / 2.0f, (model_origin_clip_position.y + 1) / 2.0f);
+        Vector2 model_origin_clip_uv = Vector2((model_origin_clip_position.x + 1) / 2.0f, (model_origin_clip_position.y + 1) / 2.0f);
 
+        //轴的模型坐标x
         Vector4 axis_x_local_position_4(1, 0, 0, 1);
         if (m_axis_mode == EditorAxisMode::ScaleMode)
         {
@@ -539,7 +551,7 @@ namespace SimpleEngine
         auto& instance_id_allocator   = g_editor_global_context.m_render_system->getGOInstanceIdAllocator();
         auto& mesh_asset_id_allocator = g_editor_global_context.m_render_system->getMeshAssetIdAllocator();
 
-        // assign some value that won't be used by other game objects
+        //分配三个轴模式的实例id、网格id
         {
             GameObjectPartId axis_instance_id = {0xFFAA, 0xFFAA};
             MeshSourceDesc   mesh_source_desc = {"%%translation_axis%%"};
@@ -564,8 +576,9 @@ namespace SimpleEngine
             m_scale_aixs.m_mesh_asset_id = mesh_asset_id_allocator.allocGuid(mesh_source_desc);
         }
 
+        //用这些数据创建轴
         g_editor_global_context.m_render_system->createAxis(
             {m_translation_axis, m_rotation_axis, m_scale_aixs},
             {m_translation_axis.m_mesh_data, m_rotation_axis.m_mesh_data, m_scale_aixs.m_mesh_data});
     }
-} // namespace Piccolo
+}

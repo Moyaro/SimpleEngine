@@ -16,6 +16,9 @@ namespace SimpleEngine
         std::shared_ptr<Engine> engine_runtime;
     };
 
+    /// <summary>
+    /// 编辑器上下文：初始化编辑器的场景、输入管理器
+    /// </summary>
     class EditorGlobalContext
     {
     public:
