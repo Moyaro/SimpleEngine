@@ -649,6 +649,7 @@ namespace SimpleEngine {
                 ImGui::MenuItem("Detail", nullptr, &m_detail_window_open);
                 ImGui::EndMenu();
             }
+            
             ImGui::EndMenuBar();
         }
 
@@ -658,10 +659,9 @@ namespace SimpleEngine {
     void EditorUI::showEditorWorldObjectsWindow(bool* p_open)
     {
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
-
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
-        if (!*p_open)
+        if (!*p_open)//未打开窗口
             return;
 
         if (!ImGui::Begin("World Objects", p_open, window_flags))
@@ -670,22 +670,51 @@ namespace SimpleEngine {
             return;
         }
 
-        std::shared_ptr<Level> current_active_level =
-            g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
+        //获取关卡
+        std::shared_ptr<Level> current_active_level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
         if (current_active_level == nullptr)
             return;
-
         const LevelObjectsMap& all_gobjects = current_active_level->getAllGObjects();
+
+        if (ImGui::BeginMenu("Create Object")) //创建物体按钮
+        {
+            if (ImGui::MenuItem("stairs")) {
+                unsigned int new_object_index = 1;
+                for (auto& id_object_pair : all_gobjects)//目前只支持从上到下的顺序
+                {
+                    if (id_object_pair.second->getName().find("New_stairs_") != std::string::npos)
+                    {
+                        int index = id_object_pair.second->getName().back() - '0';
+                        if (index == new_object_index)
+                            new_object_index++;
+                    }
+                }
+
+                ObjectInstanceRes new_object_instance_res;
+                new_object_instance_res.m_name = "New_stairs_" + std::to_string(new_object_index);
+                new_object_instance_res.m_definition = "asset/objects/environment/stairs/stairs.object.json";
+
+                size_t new_gobject_id = current_active_level->createObject(new_object_instance_res);
+                if (new_gobject_id != k_invalid_gobject_id)
+                {
+                    g_editor_global_context.m_scene_manager->onGObjectSelected(new_gobject_id);
+                }
+            }
+            ImGui::EndMenu();
+         }
+
+        //遍历关卡中的物体
         for (auto& id_object_pair : all_gobjects)
         {
+            //获取id，物体，名称
             const GObjectID          object_id = id_object_pair.first;
             std::shared_ptr<GObject> object = id_object_pair.second;
             const std::string        name = object->getName();
-            if (name.size() > 0)
+            if (name.size() > 0)//名称非空时，设置为可选的按钮
             {
-                if (ImGui::Selectable(name.c_str(),
-                    g_editor_global_context.m_scene_manager->getSelectedObjectID() == object_id))
+                if (ImGui::Selectable(name.c_str(), g_editor_global_context.m_scene_manager->getSelectedObjectID() == object_id))
                 {
+                    //选中和未选中时触发的事件
                     if (g_editor_global_context.m_scene_manager->getSelectedObjectID() != object_id)
                     {
                         g_editor_global_context.m_scene_manager->onGObjectSelected(object_id);
@@ -946,8 +975,7 @@ namespace SimpleEngine {
         {
             ImGui::PushID(string_id);
             ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);
-            ImGui::PushStyleColor(ImGuiCol_Button,
-                ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(check_button_color.x, check_button_color.y, check_button_color.z, 0.40f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, check_button_color);
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, check_button_color);
             ImGui::Button(string_id);
