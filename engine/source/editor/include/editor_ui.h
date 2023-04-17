@@ -28,7 +28,7 @@ namespace SimpleEngine {
 	private:
 		void        onFileContentItemClicked(EditorFileNode* node);//文件被点击发生的事件
 		void        buildEditorFileAssetsUITree(EditorFileNode* node);
-		void        drawAxisToggleButton(const char* string_id, bool check_state, int axis_mode);
+		void        drawAxisToggleButton(const char* string_id, bool check_state, int axis_mode);//轴模式切换按钮绘制
 		void        createClassUI(Reflection::ReflectionInstance& instance);
 		void        createLeafNodeUI(Reflection::ReflectionInstance& instance);
 		std::string getLeafUINodeParentLabel();
@@ -41,6 +41,7 @@ namespace SimpleEngine {
 		void showEditorDetailWindow(bool* p_open);
 
 		void setUIColorStyle();
+        void setUIPinkColorStyle();
 
 		std::unordered_map<std::string, std::function<void(std::string, void*)>> m_editor_ui_creator;
 		std::unordered_map<std::string, unsigned int> m_new_object_index_map;//物体索引

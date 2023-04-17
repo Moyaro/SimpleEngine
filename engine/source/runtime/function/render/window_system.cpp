@@ -39,7 +39,7 @@ namespace SimpleEngine {
 		glfwSetWindowSizeCallback(m_window, windowSizeCallback);
 		glfwSetWindowCloseCallback(m_window, windowCloseCallback);
 
-		glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);//禁用原始鼠标移动
+		glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);//禁用原始鼠标
 	}
 
 	void WindowSystem::setFocusMode(bool mode)

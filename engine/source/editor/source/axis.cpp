@@ -3,7 +3,7 @@
 namespace SimpleEngine {
     EditorTranslationAxis::EditorTranslationAxis()
     {
-        // create translation axis render mesh
+        //移动轴模式的网格
 
         const float radius = 0.031f;
         const int   segments = 12;

@@ -26,7 +26,7 @@ namespace SimpleEngine
     {
         m_game_command &= (k_complement_control_command ^ (unsigned int)GameCommand::jump);
 
-        if (action == GLFW_PRESS)
+        if (action == GLFW_PRESS)//添加命令
         {
             switch (key)
             {
@@ -68,7 +68,7 @@ namespace SimpleEngine
                     break;
             }
         }
-        else if (action == GLFW_RELEASE)
+        else if (action == GLFW_RELEASE)//删除命令
         {
             switch (key)
             {
@@ -103,6 +103,7 @@ namespace SimpleEngine
 
     void InputSystem::onCursorPos(double current_cursor_x, double current_cursor_y)
     {
+        //窗口处于焦点模式下，才会更新鼠标的移动量
         if (g_runtime_global_context.m_window_system->getFocusMode())
         {
             m_cursor_delta_x = m_last_cursor_x - current_cursor_x;
@@ -122,7 +123,7 @@ namespace SimpleEngine
     {
         std::array<int, 2> window_size = g_runtime_global_context.m_window_system->getWindowSize();
 
-        if (window_size[0] < 1 || window_size[1] < 1)
+        if (window_size[0] < 1 || window_size[1] < 1)//窗口太小，无法计算
         {
             return;
         }
@@ -133,6 +134,7 @@ namespace SimpleEngine
         Radian cursor_delta_x(Math::degreesToRadians(m_cursor_delta_x));
         Radian cursor_delta_y(Math::degreesToRadians(m_cursor_delta_y));
 
+        //鼠标移动量对相机两个旋转轴向的影响
         m_cursor_delta_yaw   = (cursor_delta_x / (float)window_size[0]) * fov.x;
         m_cursor_delta_pitch = -(cursor_delta_y / (float)window_size[1]) * fov.y;
     }
@@ -142,6 +144,7 @@ namespace SimpleEngine
         std::shared_ptr<WindowSystem> window_system = g_runtime_global_context.m_window_system;
         assert(window_system);
 
+        //注册回调函数
         window_system->registerOnKeyFunc(std::bind(&InputSystem::onKey,
                                                    this,
                                                    std::placeholders::_1,
@@ -154,11 +157,11 @@ namespace SimpleEngine
 
     void InputSystem::tick()
     {
-        calculateCursorDeltaAngles();
-        clear();
+        calculateCursorDeltaAngles();//计算相机旋转角度
+        clear();//清理光标移动量
 
         std::shared_ptr<WindowSystem> window_system = g_runtime_global_context.m_window_system;
-        if (window_system->getFocusMode())
+        if (window_system->getFocusMode())//只有在焦点模式下控制才有效
         {
             m_game_command &= (k_complement_control_command ^ (unsigned int)GameCommand::invalid);
         }

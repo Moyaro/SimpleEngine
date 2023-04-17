@@ -12,9 +12,9 @@ namespace SimpleEngine
 
     enum class CameraMode : unsigned char
     {
-        third_person,
-        first_person,
-        free,
+        third_person,//第三人称
+        first_person,//第一人称
+        free,//自由视角
         invalid
     };
 
@@ -41,11 +41,9 @@ namespace SimpleEngine
         void tickFreeCamera(float delta_time);
 
         META(Enable)
-        CameraComponentRes m_camera_res;
-
-        CameraMode m_camera_mode {CameraMode::invalid};
-
-        Vector3 m_position;
+        CameraComponentRes m_camera_res;//相机资源
+        CameraMode m_camera_mode {CameraMode::invalid};//相机模式
+        Vector3 m_position;//位置
 
         Vector3 m_forward {Vector3::NEGATIVE_UNIT_Y};
         Vector3 m_up {Vector3::UNIT_Z};

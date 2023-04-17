@@ -313,6 +313,52 @@ namespace SimpleEngine {
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     }
+    void EditorUI::setUIPinkColorStyle() {
+        ImGuiStyle* style  = &ImGui::GetStyle();
+        ImVec4*     colors = style->Colors;
+
+        colors[ImGuiCol_Text]         = ImVec4(0.95f, 0.95f, 1.00f, 1.00f);
+        colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+        colors[ImGuiCol_WindowBg]     = ImVec4(0.10f, 0.10f, 0.20f, 1.00f);
+        colors[ImGuiCol_ChildBg]      = ImVec4(0.10f, 0.10f, 0.20f, 0.00f);
+        colors[ImGuiCol_PopupBg]      = ImVec4(0.15f, 0.15f, 0.30f, 1.00f);
+        colors[ImGuiCol_Border]       = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_BorderShadow] = ImVec4 (0.30f, 0.45f,0.30f,0.85f);
+        colors[ImGuiCol_TitleBgActive]        = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_TitleBgCollapsed]     = ImVec4(0.70f, 0.30f, 0.30f, 0.35f);
+        colors[ImGuiCol_MenuBarBg]            = ImVec4(0.10f, 0.10f, 0.20f, 0.47f);
+        colors[ImGuiCol_ScrollbarBg]          = ImVec4(0.10f, 0.10f, 0.20f, 0.53f);
+        colors[ImGuiCol_ScrollbarGrab]        = ImVec4(0.70f, 0.30f, 0.30f, 0.29f);
+        colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_ScrollbarGrabActive]  = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_CheckMark]            = ImVec4(0.90f, 0.40f, 0.40f, 1.00f);
+        colors[ImGuiCol_SliderGrab]           = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_SliderGrabActive]     = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_Button]               = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_ButtonHovered]        = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_ButtonActive]         = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_Header]               = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_HeaderHovered]        = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_HeaderActive] = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_Separator]            = ImVec4(0.70f, 0.30f,0.50f,1.00f);
+        colors[ImGuiCol_Tab] = ImVec4(0.70f, 0.30f, 0.30f, 0.65f); 
+        colors[ImGuiCol_TabHovered] = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_TabActive] = ImVec4(0.90f, 0.40f, 0.40f, 0.91f);
+        colors[ImGuiCol_TabUnfocused] = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_PlotLines] = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_PlotLinesHovered]     = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_PlotHistogram]        = ImVec4(0.70f, 0.30f, 0.30f, 0.65f);
+        colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.90f, 0.40f, 0.40f, 0.87f);
+        colors[ImGuiCol_TextSelectedBg]       = ImVec4(0.90f, 0.40f, 0.40f, 0.29f);
+        colors[ImGuiCol_DragDropTarget]       = ImVec4(0.90f, 0.40f, 0.40f, 0.95f);
+
+        style->WindowRounding    = 10.0f;
+        style->FrameRounding    = 10.0f;
+        style->ScrollbarRounding = 10.0f;
+        style->GrabRounding      = 10.0f;
+        style->TabRounding       = 10.0f;
+    }
 
     void EditorUI::onFileContentItemClicked(EditorFileNode* node)
     {
@@ -325,6 +371,7 @@ namespace SimpleEngine {
         if (level == nullptr)
             return;
 
+        //创建物体
         const unsigned int new_object_index = ++m_new_object_index_map[node->m_file_name];
 
         ObjectInstanceRes new_object_instance_res;
@@ -444,11 +491,11 @@ namespace SimpleEngine {
     {
         Reflection::ReflectionInstance* reflection_instance;
         int count = instance.m_meta.getBaseClassReflectionInstanceList(reflection_instance, instance.m_instance);
-        for (int index = 0; index < count; index++)
+        for (int index = 0; index < count; index++)//创建类中类
         {
             createClassUI(reflection_instance[index]);
         }
-        createLeafNodeUI(instance);
+        createLeafNodeUI(instance);//创建叶子结点
 
         if (count > 0)
             delete[] reflection_instance;
@@ -456,6 +503,7 @@ namespace SimpleEngine {
 
     void EditorUI::createLeafNodeUI(Reflection::ReflectionInstance& instance)
     {
+        //获取属性值
         Reflection::FieldAccessor* fields;
         int                        fields_count = instance.m_meta.getFieldsList(fields);
 
@@ -557,7 +605,7 @@ namespace SimpleEngine {
         ImGuiWindowFlags   window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground |
-            ImGuiConfigFlags_NoMouseCursorChange | ImGuiWindowFlags_NoBringToFrontOnFocus;
+            ImGuiConfigFlags_NoMouseCursorChange | ImGuiWindowFlags_NoBringToFrontOnFocus;//菜单栏、无标题栏、不能折叠、不能改变大小、不能移动、无背景、禁止改变鼠标光标和不会在聚焦时前置。
 
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(main_viewport->WorkPos, ImGuiCond_Always);
@@ -574,21 +622,23 @@ namespace SimpleEngine {
             ImGui::DockBuilderRemoveNode(main_docking_id);
 
             ImGui::DockBuilderAddNode(main_docking_id, dock_flags);
-            ImGui::DockBuilderSetNodePos(main_docking_id,
+            ImGui::DockBuilderSetNodePos(main_docking_id,//结点位置
                 ImVec2(main_viewport->WorkPos.x, main_viewport->WorkPos.y + 18.0f));
-            ImGui::DockBuilderSetNodeSize(main_docking_id,
+            ImGui::DockBuilderSetNodeSize(main_docking_id,//结点大小
                 ImVec2((float)window_size[0], (float)window_size[1] - 18.0f));
 
+            //分割center：左：0.75，右：0.25（Components Details）
             ImGuiID center = main_docking_id;
             ImGuiID left;
             ImGuiID right = ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.25f, nullptr, &left);
 
+            //分割left，上：0.7，下：0.3（File Content）
             ImGuiID left_other;
             ImGuiID left_file_content = ImGui::DockBuilderSplitNode(left, ImGuiDir_Down, 0.30f, nullptr, &left_other);
 
+            //分割left_other，右：0.7f（Game Engine），左：0.3（World Objects）
             ImGuiID left_game_engine;
-            ImGuiID left_asset =
-                ImGui::DockBuilderSplitNode(left_other, ImGuiDir_Left, 0.30f, nullptr, &left_game_engine);
+            ImGuiID left_asset = ImGui::DockBuilderSplitNode(left_other, ImGuiDir_Left, 0.30f, nullptr, &left_game_engine);
 
             ImGui::DockBuilderDockWindow("World Objects", left_asset);
             ImGui::DockBuilderDockWindow("Components Details", right);
@@ -649,7 +699,18 @@ namespace SimpleEngine {
                 ImGui::MenuItem("Detail", nullptr, &m_detail_window_open);
                 ImGui::EndMenu();
             }
-            
+            if (ImGui::BeginMenu("Style")) //控制窗口显示
+            {
+                if (ImGui::MenuItem("Default"))
+                {
+                    setUIColorStyle();
+                }
+                if (ImGui::MenuItem("other"))
+                {
+                    setUIPinkColorStyle();
+                }
+                ImGui::EndMenu();
+            }
             ImGui::EndMenuBar();
         }
 
@@ -820,7 +881,7 @@ namespace SimpleEngine {
     void EditorUI::showEditorGameWindow(bool* p_open)
     {
         ImGuiIO& io = ImGui::GetIO();
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;//没有背景+右菜单栏
 
         const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
@@ -837,6 +898,7 @@ namespace SimpleEngine {
         static bool rotate_button_ckecked = false;
         static bool scale_button_ckecked = false;
 
+        //先切换轴模式
         switch (g_editor_global_context.m_scene_manager->getEditorAxisMode())
         {
         case EditorAxisMode::TranslateMode:
@@ -858,6 +920,7 @@ namespace SimpleEngine {
             break;
         }
 
+        //轴模式的切换按钮
         if (ImGui::BeginMenuBar())
         {
             ImGui::Indent(10.f);
@@ -971,7 +1034,7 @@ namespace SimpleEngine {
 
     void EditorUI::drawAxisToggleButton(const char* string_id, bool check_state, int axis_mode)
     {
-        if (check_state)
+        if (check_state)//设置样式
         {
             ImGui::PushID(string_id);
             ImVec4 check_button_color = ImVec4(93.0f / 255.0f, 10.0f / 255.0f, 66.0f / 255.0f, 1.00f);

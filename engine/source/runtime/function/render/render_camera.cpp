@@ -40,7 +40,8 @@ namespace SimpleEngine {
     Matrix4x4 RenderCamera::getPersProjMatrix() const
     {
         Matrix4x4 fix_mat(1, 0, 0, 0,  0, -1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1);//修正裁剪坐标Y轴是反转的问题
-        Matrix4x4 proj_mat = fix_mat * Math::makePerspectiveMatrix(Radian(Degree(m_fovy)), m_aspect, m_znear, m_zfar);//
+        Matrix4x4 proj_mat = fix_mat * Math::makePerspectiveMatrix(Radian(Degree(m_fovy)), m_aspect, m_znear, m_zfar);
+        //Matrix4x4 proj_mat = fix_mat * Math::makeOrthographicProjectionMatrix(100,100,100,100,m_znear, m_zfar);
 
         return proj_mat;
     }

@@ -18,11 +18,12 @@ namespace SimpleEngine
         Component() = default;
         virtual ~Component() {}
 
-        //物体实例化：资源加载后设置进属性
+        //组件资源加载后设置进属性：每个组件都要挂载到物体上
         virtual void postLoadResource(std::weak_ptr<GObject> parent_object) { m_parent_object = parent_object; }
 
         virtual void tick(float delta_time) {};
 
+        //dirty：刚体组件需要被更新
         bool isDirty() const { return m_is_dirty; }
         void setDirtyFlag(bool is_dirty) { m_is_dirty = is_dirty; }
 

@@ -11,9 +11,9 @@ namespace SimpleEngine
         left     = 1 << 2,                 // A
         right    = 1 << 3,                 // D
         jump     = 1 << 4,                 // SPACE
-        squat    = 1 << 5,                 // not implemented yet
+        squat    = 1 << 5,                 // 
         sprint   = 1 << 6,                 // LEFT SHIFT
-        fire     = 1 << 7,                 // not implemented yet
+        fire     = 1 << 7,                 // 
         free_carema = 1 << 8,              // F
         invalid  = (unsigned int)(1 << 31) // lost focus
     };
@@ -24,16 +24,18 @@ namespace SimpleEngine
     {
 
     public:
-        void onKey(int key, int scancode, int action, int mods);//键盘命令
+        void onKey(int key, int scancode, int action, int mods);//游戏模式下的键盘命令
         void onCursorPos(double current_cursor_x, double current_cursor_y);
 
-        void init();
+        void init();//获取窗口系统，注册回调函数
         void tick();
-        void clear();
+        void clear();//清理光标移动量
 
+        //光标移动量
         int m_cursor_delta_x {0};
         int m_cursor_delta_y {0};
 
+        //更新相机角度
         Radian m_cursor_delta_yaw {0};
         Radian m_cursor_delta_pitch {0};
 

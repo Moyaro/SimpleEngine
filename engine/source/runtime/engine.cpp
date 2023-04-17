@@ -68,7 +68,7 @@ namespace SimpleEngine {
 	}
 
 	void Engine::logicalTick(float delta_time) {
-		g_runtime_global_context.m_world_manager->tick(delta_time);
+		g_runtime_global_context.m_world_manager->tick(delta_time);//¼ÓÔØÊÀ½ç¡¢tick level
 		g_runtime_global_context.m_input_system->tick();
 	}
 	void Engine::rendererTick(float delta_time) {

@@ -20,6 +20,7 @@ namespace SimpleEngine
     {
         m_parent_object = parent_object;
 
+        //设置相机类型
         const std::string& camera_type_name = m_camera_res.m_parameter.getTypeName();
         if (camera_type_name == "FirstPersonCameraParameter")
         {
@@ -35,12 +36,13 @@ namespace SimpleEngine
         }
         else
         {
-            LOG_ERROR("invalid camera type");
+            LOG_ERROR("无效相机类型");
         }
 
+        //设置相机交换数据
         RenderSwapContext& swap_context = g_runtime_global_context.m_render_system->getSwapContext();
-        CameraSwapData     camera_swap_data;
-        camera_swap_data.m_fov_x                           = m_camera_res.m_parameter->m_fov;
+        CameraSwapData camera_swap_data;
+        camera_swap_data.m_fov_x = m_camera_res.m_parameter->m_fov;
         swap_context.getLogicSwapData().m_camera_swap_data = camera_swap_data;
     }
 
@@ -51,6 +53,7 @@ namespace SimpleEngine
 
         std::shared_ptr<Level> current_level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
 
+        //根据相机模式进行tick
         switch (m_camera_mode)
         {
             case CameraMode::first_person:
@@ -71,6 +74,7 @@ namespace SimpleEngine
     {
         std::shared_ptr<Level> current_level = g_runtime_global_context.m_world_manager->getCurrentActiveLevel().lock();
 
+        //获取相机上的transform组件后，读取变换信息获取相机位置
         std::shared_ptr<GObject> camera = current_level->getCameraObject();
         Vector3 cameraPosition;
         TransformComponent* camera_transform_component = camera->tryGetComponent(TransformComponent);

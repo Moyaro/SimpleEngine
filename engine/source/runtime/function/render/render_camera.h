@@ -44,13 +44,13 @@ namespace SimpleEngine {
 
         void move(Vector3 delta) { m_position += delta; }//移动
         void rotate(Vector2 delta);//旋转
-        void zoom(float offset);//调整相机视角
+        void zoom(float offset);//缩放
         void lookAt(const Vector3& position, const Vector3& target, const Vector3& up);//设置相机朝向
 
         void setAspect(float aspect);//设置宽高比
         void setFOVx(float fovx) { m_fovx = fovx; }//设置相机水平视角
 
-        //右：X轴，前：Y轴，上：Z轴
+        //右：X轴，前：Y轴，上：Z轴，目前轴的旋转角度
         Vector3  forward() const { return (m_invRotation * Y); }
         Vector3  up() const { return (m_invRotation * Z); }
         Vector3  right() const { return (m_invRotation * X); }
@@ -62,7 +62,7 @@ namespace SimpleEngine {
         //获取矩阵
         Matrix4x4 getViewMatrix();
         Matrix4x4 getPersProjMatrix() const;
-        Matrix4x4 getLookAtMatrix() const { return Math::makeLookAtMatrix(position(), position() + forward(), up()); }
+        Matrix4x4 getLookAtMatrix() const { return Math::makeLookAtMatrix(position(), position() + forward(), up()); }//世界->相机空间：位置，目标位置，垂直轴
 
         
 

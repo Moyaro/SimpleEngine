@@ -103,9 +103,9 @@ namespace SimpleEngine
     {
         const Vector3& up = up_dir.normalisedCopy();
 
-        Vector3 f = (target_position - eye_position).normalisedCopy();
-        Vector3 s = f.crossProduct(up).normalisedCopy();
-        Vector3 u = s.crossProduct(f);
+        Vector3 f = (target_position - eye_position).normalisedCopy();//观察方向
+        Vector3 s = f.crossProduct(up).normalisedCopy();//右方向
+        Vector3 u = s.crossProduct(f);//上方向
 
         Matrix4x4 view_mat = Matrix4x4::IDENTITY;
 

@@ -18,18 +18,19 @@ namespace SimpleEngine
 
         void postLoadResource(std::weak_ptr<GObject> parent_object) override;
 
+        //设置/获取位置、缩放、旋转
         Vector3    getPosition() const { return m_transform_buffer[m_current_index].m_position; }
         Vector3    getScale() const { return m_transform_buffer[m_current_index].m_scale; }
         Quaternion getRotation() const { return m_transform_buffer[m_current_index].m_rotation; }
-
         void setPosition(const Vector3& new_translation);
         void setScale(const Vector3& new_scale);
         void setRotation(const Quaternion& new_rotation);
 
-        //获取当前变换矩阵
+        //获取变换
         const Transform& getTransformConst() const { return m_transform_buffer[m_current_index]; }
         Transform&       getTransform() { return m_transform_buffer[m_next_index]; }
 
+        //获取变换矩阵
         Matrix4x4 getMatrix() const { return m_transform_buffer[m_current_index].getMatrix(); }
 
         void tick(float delta_time) override;
